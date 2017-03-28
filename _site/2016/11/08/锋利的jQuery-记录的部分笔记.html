@@ -1,0 +1,132 @@
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th style="text-align: left">Window.onload</th>
+      <th style="text-align: left">$(document).ready()</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>执行时机</td>
+      <td style="text-align: left">必须等待网页中所有的内容（包括图片）加载完毕后才能执行</td>
+      <td style="text-align: left">网页中所有DOM结构绘制完毕就执行，可能DOM元素关联的东西并没有加载完</td>
+    </tr>
+    <tr>
+      <td>编写个数</td>
+      <td style="text-align: left">不能同时编写多个，<br />以下代码无法正确执行：<br />Window.onload =function(){<br /> alert(‘test1’);<br />} <br />Window.onload =function(){<br /> alert(‘test2’);<br />}<br />结果只会输出”test2”</td>
+      <td style="text-align: left">能同时编写多个，<br />以下代码正确执行：<br />$(document).ready(){<br /> alert(‘hello world’);<br />} <br />$(document).ready(){<br /> alert(‘hello again’);<br />} <br />结果两次都输出</td>
+    </tr>
+    <tr>
+      <td>简化写法</td>
+      <td style="text-align: left">无</td>
+      <td style="text-align: left">$(document).ready(){}<br />可以简化写成<br />$(function(){})</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>###jquery链式操作代码块风格
+子元素的操作推荐缩进</p>
+<blockquote>
+  <p>$(this).addClass(‘highlight’)
+ .children(‘li’).show().end()
+.siblings().removeClass(‘highlight’)
+ .children(‘li’).hide()</p>
+</blockquote>
+
+<p>###事件冒泡(阻止事件冒泡和自身的默认行为)</p>
+<blockquote>
+  <p><code class="highlighter-rouge">
+$(element).bing('click', function(){
+    //点击事件的处理
+    event.stopPropagation(); //停止事件冒泡
+})</code>
+ 页面某些元素有默认行为，比如submit的表单提交
+<code class="highlighter-rouge">event.preventDefault();//可以阻止元素的默认行为</code></p>
+</blockquote>
+
+<p>###只能使用一次的点击事件，用one绑定</p>
+<blockquote>
+  <p>$(element).one(‘click’, function(){})</p>
+</blockquote>
+
+<p>###序列化元素</p>
+<blockquote>
+  <ul>
+    <li>serialize()
+当表单中的内容比较多时，一个一个获取Input的内容显然是不合适的，此时就可以用到serialize()，例如
+$(‘#form’).serialize()
+$(“:checked,:radio”).serialize()只会将选中的值序列化
+$(‘#form’).serializeArray()不是返回字符串了，而是返回json</li>
+    <li>$.param()方法
+var obj = {a:1,b:2,c:3}
+var k = $.param(obj)
+此时k输出为a=1&amp;b=2&amp;c=3</li>
+  </ul>
+</blockquote>
+
+<blockquote>
+  <ul>
+    <li>$(element).ajaxStart({})//ajax开始之前，比如在页面部分地方显示加载中。。。</li>
+    <li>$(element).ajaxStop({})</li>
+  </ul>
+</blockquote>
+
+<p>###JQuery validator</p>
+<blockquote>
+  <p><code class="highlighter-rouge">//自定义一个验证方法
+$.validator.addMethod(
+    "functionName",
+    function(value,element,param){
+        return value == eval(param)
+    },
+    '错误提示信息'
+)
+</code></p>
+</blockquote>
+
+<p>###闭包
+<img src="http://upload-images.jianshu.io/upload_images/1874069-efc319091e0ec3ad.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="闭包1.png" /></p>
+
+<p><img src="http://upload-images.jianshu.io/upload_images/1874069-cde631971f53c1c2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="闭包2.png" /></p>
+
+<p>###常见的JQuery插件写法</p>
+<blockquote>
+  <p><code class="highlighter-rouge"> 
+;(function($){
+      /*这里放置代码*/
+ })(jQuery);</code></p>
+</blockquote>
+
+<p><img src="http://upload-images.jianshu.io/upload_images/1874069-73d49e8583a9123d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="JQuery.png" /></p>
+
+<p>###jQuery判断浏览器类型</p>
+<blockquote>
+  <p><code class="highlighter-rouge">$(document).ready(){
+    //Firefox 2 and above
+    if ( $.browser.mozilla &amp;&amp; $.browser.version &gt;= "1.8" ) {
+        //do something
+    }
+    //Safari
+    if ( $.browser.safari ) {
+        //do something
+    }
+    //Chrome
+    if ( $.browser.chrome ) {
+        //do something
+    }
+    //Opera
+    if ( $.browser.opera ) {
+        //do something
+    }
+    //IE6 and below
+    if ( $.browser.mise &amp;&amp;  $.browser.version &lt;= "6" ) {
+        //do something
+    }
+    //anything above IE6
+    if ( $.browser.mise &amp;&amp;  $.browser.version &gt; 6 ) {
+        //do something
+    }
+}
+</code></p>
+</blockquote>

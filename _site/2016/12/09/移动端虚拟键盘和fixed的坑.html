@@ -1,0 +1,34 @@
+<p>这两天接手一个新需求，做一个直播间的页面，用于微信平台。</p>
+<h1 id="需求">需求</h1>
+<p>页面的设计稿要求 头部和底部置顶，底部有输入框，中间部分为显示内容的区域，可滚动</p>
+<blockquote>
+  <p>`  &lt;section class="header award-frame"&gt;&lt;/section&gt;</p>
+</blockquote>
+<section class="main"></section>
+<section class="footer input-area"></section>
+<p>`</p>
+
+<h1 id="问题">问题</h1>
+
+<blockquote>
+  <ul>
+    <li>虚拟键盘弹起时，fixed样式失效</li>
+    <li>无法监听虚拟键盘弹起、关闭状态</li>
+  </ul>
+</blockquote>
+
+<h1 id="解决方案">解决方案</h1>
+<h3 id="1用absolute和relative代替fixed">1.用absolute和relative代替fixed</h3>
+<p>1.在键盘弹起的时候，将头部定位成relative，底部定位为absolute，但是此时底部的bottom:0是相对屏幕高度来说的，也就是说当屏幕滑动时，底部也会滚动</p>
+<h3 id="2使用iscrolljs">2.使用iscroll.js</h3>
+<p>JS代码
+<img src="http://upload-images.jianshu.io/upload_images/1874069-dc626e6529fffd81.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="iscroll-js.png" />
+页面代码结构
+<img src="http://upload-images.jianshu.io/upload_images/1874069-862e042c5317a683.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="iscroll.png" /></p>
+
+<h3 id="3微信设置">3.微信设置</h3>
+<p>这是向同事请教的一个办法，微信可以设置虚拟键盘弹起的时候，不改变页面的样式，但是此种方案只适用于微信， <a href="http://jingyan.baidu.com/article/e5c39bf5a044e839d7603332.html" title="百度相关链接">百度相关链接</a> 
+将我们的域名添加进去，在微信端打开的时候就不会再重新布局了，不知道这个解决办法是否可行，因为第二天打开的时候，发现并没有出现所预期的效果，还是被重新布局了</p>
+
+<p>###4.监听虚拟键盘
+虚拟键盘的弹起和关闭状态，可以用resize()来进行监听，当然，屏幕旋转的时候也会触发这个方法，此时就需要自己做判断控制。</p>

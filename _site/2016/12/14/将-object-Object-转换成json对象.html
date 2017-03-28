@@ -1,0 +1,59 @@
+<p>这两天在做中英文双版的文件，页面根据语言读取不同的内容。js模板用的是ejs</p>
+<blockquote>
+  <p>json文件： 
+`
+“components”:{
+  “pages”:{
+    “home”:{
+        “meta”:{
+          “title”:”首页”,
+          “keywords”:”关键字”,
+          “desc”:”描述”
+        },
+       “title”:”登录失败”,
+       “button”:”重新登录”
+    }
+  }
+}<code class="highlighter-rouge">
+页面js代码
+</code>let metaTitle = “&lt;%= components.pages.home.meta.title %&gt;”
+console.log(metaTitle)
+//控制台输出：首页 `
+但是当json文件中数据很多，而又都需要的情况下，显然不能一条一条赋值，最好是可以将整个对象进行赋值，比如：
+<code class="highlighter-rouge">let home ="&lt;%= components.pages.home %&gt;"
+console.log(home)
+//控制台输出：[object Object]</code>
+这种情况下，控制台输出的是[object Object]，看不到具体的内容，于是需要将它转换成与json文件中格式一致，方便在js中使用</p>
+  <ul>
+    <li>JSONObject.fromObject()
+`
+let home = “&lt;%= components.pages.home %&gt;”
+let homeObj = JSONObject.fromObject(home);
+console.log(homeObj)
+//ReferenceError: JSONObject is not defined[详细了解]
+`</li>
+    <li>JSON.stringify()
+`
+let home = “&lt;%= components.pages.home %&gt;”
+let homeObj = JSON.stringify(home);
+console.log(homeObj)
+//”[object Object]”
+`</li>
+    <li>JSON.parse()
+`
+let home = “&lt;%= components.pages.home %&gt;”
+let homeObj = JSON.parse(home);
+console.log(homeObj)
+//SyntaxError: JSON.parse: unexpected character at line 1 column 2 of the JSON data[详细了解]
+`</li>
+    <li>ps:let home = “&lt;%= components.pages.home %&gt;” 这里的双引号在解析的时候，会和内部的双引号行程匹配，所以下一种办法中，将”“改成了’’</li>
+    <li>最后提供一种目前自己代码使用的办法
+ `
+let home = JSON.parse(decodeURI(‘&lt;%- encodeURI(JSON.stringify(components.pages.home)) %&gt;’))
+`
+后来发现并不需要decode和encode
+`
+let home = JSON.parse(‘&lt;%- JSON.stringify(components.pages.home) %&gt;’)
+`</li>
+  </ul>
+</blockquote>

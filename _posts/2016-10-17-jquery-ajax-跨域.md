@@ -1,0 +1,63 @@
+[jquery ajax 跨域](http://www.cnblogs.com/sunxucool/p/3430914.html)
+
+客户端“跨域访问”一直是一个头疼的问题，好在有jQuery帮忙，从jQuery-1.2以后跨域问题便迎刃而解。由于自己在项目中遇到跨域问题，借此机会对跨域问题来刨根问底，查阅了相关资料和自己的实践，算是解决了跨域问题。便记录下来，以供查阅。        
+ jQuery.ajax()支持get方式的跨域，这其实是采用jsonp的方式来完成的。        
+真实案例：        
+>`
+$.ajax({ 
+    async:false, 
+    url: 'http://www.mysite.com/demo.do', // 跨域URL 
+    type: 'GET', 
+    dataType: 'jsonp', 
+    jsonp: 'jsoncallback', //默认callback 
+    data: mydata, 
+    timeout: 5000, 
+    beforeSend: function(){ 
+        //jsonp 方式此方法不被触发。原因可能是dataType如果指定为jsonp的话，就已经不是ajax事件了 
+    }, 
+    success: function (json) { 
+        //客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数 
+        if(json.actionErrors.length!=0){ 
+            alert(json.actionErrors); 
+        } 
+        genDynamicContent(qsData,type,json); 
+    }, 
+    complete: function(XMLHttpRequest, textStatus){ 
+        $.unblockUI({ 
+            fadeOut: 10 
+        }); 
+    }, 
+    error: function(xhr){ 
+        //jsonp 方式此方法不被触发 
+        //请求出错处理 
+        alert("请求出错(请检查相关度网络状况.)"); 
+    }
+});`
+
+注意：        
+>`
+$.getJSON(" http://www.mysite.com/demo.do?name1="+value1+"&callback=?", function(json){
+        if(json.属性名==值){ 
+            // 执行代码 
+        } 
+});`
+
+这种方式其实是上例$.ajax({..}) api的一种高级封装，有些$.ajax api底层的参数就被封装而不可见了。    
+
+在服务端通过callback= request.getParameter("callback") 得到jQuery端随后要回调的jsonp32440980    
+
+然后返回类似:"jsonp32440980("+要返回的json数组+")";     
+
+jquery就会通过回调方法动态加载调用这个:jsonp32440980(json数组);    
+
+这样就达到了跨域数据交换的目的.    
+
+ jsonp的最基本的原理是:动态添加一个是一致的(qq空间就是大量采用这种方式来实现跨域数据交换的) 。
+
+JSONP是一种脚本注入(Script Injection)行为，所以也有一定的安全隐患。    
+
+注意：jquey是不支持post方式跨域的。   
+
+ 这是因为虽然采用post +动态生成iframe是可以达到post跨域的目的(有位js牛人就是这样把jquery1.2.5 打patch的)，但这样做是一个比较极端的方式，不建议采用。也可以说get方式的跨域是合法的，post方式从安全角度上被认为是不合法的，万不得已 还是不要post，client端跨域访问的需求看来也引起w3c的注意了，看资料说html5 WebSocket标准支持跨域的数据交换，应该也是一个将来可选的跨域数据交换的解决方案。
+
+

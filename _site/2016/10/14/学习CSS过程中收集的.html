@@ -1,0 +1,96 @@
+<ul>
+  <li>修复使用sub和sup时的行间距问题
+    <blockquote>
+      <p>sub,sup{    
+ font-size: 75%;    
+ line-height: 0;    
+ position: relative;    
+ vertical-align: baseline;
+}
+sup{    
+ top:-0.5em;
+}
+sub{    
+ bottom: -0.25em;
+}
+.p{    
+ letter-spacing: 4em;/<em> 字母间距(字偶距) </em>/    
+ word-spacing: 0.4em/5px;/<em> 字间距 </em>/    
+ text-indent: 1.5em/18px;/<em> 段落第一行缩进 </em>/    
+ white-space: pre/nowrap/normal;/<em> 空格输出格式 </em>/    
+ text-transform: ;/<em> 修改文本大小写 </em>/    
+ font-variant:;/<em> 使用小型大写字母 </em>/
+}</p>
+    </blockquote>
+  </li>
+</ul>
+
+<hr />
+<ul>
+  <li>background-attachment: fixed/scroll;背景随页面滚动      
+头部上 class=”clearfix” </li>
+  <li>
+    <ul>
+      <li>
+        <ul>
+          <li>   </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>通常情况下，<code class="highlighter-rouge">&lt;pre&gt;&lt;/pre&gt;</code>保证原样输出，因此关闭了自动换行，可通过CSS<code class="highlighter-rouge">pre{white-space:pre-warp;}</code>开启自动换行</li>
+  <li>
+    <ul>
+      <li>*</li>
+    </ul>
+  </li>
+  <li>为单个元素应用多重背景
+    <blockquote>
+      <p>.neight-sky{   
+  background-color: #333;    
+ background-image: url(),url(),url();    
+ background-position: 50% 102%,100% -150%,0% -150%;  
+  background-repeat: no-repeat,no-repeat,no-repeat;
+}
+简写
+.neight-sky{    
+ background-color: #333;    
+ background:url() 0 0 no-repeat,url() 0 0 no-repeat;多写几遍就好
+}</p>
+    </blockquote>
+  </li>
+  <li>试用渐变背景
+    <blockquote>
+      <p>.neight-sky{    
+ background: linear-gradient(left,#333,#777);   
+ linear-gradient 线性渐变    
+ radial-gradient 径向渐变    多色渐变 
+ background(top,#ff0000 0%,#00ff00 50%,#0000ff 100%);
+}</p>
+    </blockquote>
+  </li>
+</ul>
+
+<hr />
+<ul>
+  <li>浏览器模式操作
+-moz- Firefox及其他使用Mozilla渲染引擎的浏览器
+-webkit-    Chrome,Safari
+-o-         Opera
+-ms-        IE8及以上 </li>
+  <li>
+    <ul>
+      <li>*</li>
+    </ul>
+  </li>
+  <li>CSS字体嵌入
+    <blockquote>
+      <p>@font-face{    
+ font-family: ;    
+ src:url() format();    
+ font-style: ;    
+ font-weight: ;
+}</p>
+    </blockquote>
+  </li>
+</ul>

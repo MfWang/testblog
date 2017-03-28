@@ -1,0 +1,1870 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="http://jekyllrb.com" version="3.4.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-03-28T19:59:24+08:00</updated><id>http://localhost:4000/</id><title type="html">Your awesome title</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
+</subtitle><entry><title type="html">Webpack+React+多语言(一) 基础配置</title><link href="http://localhost:4000/2016/12/26/Webpack+React+%E5%A4%9A%E8%AF%AD%E8%A8%80(%E4%B8%80)-%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE.html" rel="alternate" type="text/html" title="Webpack+React+多语言(一) 基础配置" /><published>2016-12-26T00:00:00+08:00</published><updated>2016-12-26T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/26/Webpack+React+%E5%A4%9A%E8%AF%AD%E8%A8%80(%E4%B8%80)-%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE</id><content type="html" xml:base="http://localhost:4000/2016/12/26/Webpack+React+%E5%A4%9A%E8%AF%AD%E8%A8%80(%E4%B8%80)-%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE.html">&lt;blockquote&gt;
+  &lt;p&gt;已经看过这一节的朋友，可以看&lt;a href=&quot;http://www.jianshu.com/p/dce81ab8940f&quot;&gt;Webpack+React+多语言(二) 插件配置+多语言&lt;/a&gt;
+github地址：&lt;a href=&quot;https://github.com/AveSore/webpack-react-language&quot;&gt;webpack-react-language&lt;/a&gt;
+关键字：react 多语言 国际版 React-intl&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;移动端网站需要重构，当前的想法是使用webpack+react来重构移动端，当然，是需要支持多语言的。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;#####1.创建一个项目：webpack-react-language
+这个项目名字有点长，我主要是为了与本地其他的项目区别开来
+目录结构
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;|- build
+  |-- index.html
+  |-- bundle.js(该文件是webpack打包后生成的)
+|- wap
+  |-- components
+      |--- Dialog.jsx
+  |-- main.js
+|- package.json(第二步生成)
+|- webpack.config.js(第四步生成)
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;#####2.创建package.json
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;npm init
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;#####3.安装webpack
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;//全局安装webpack，优点是打包时可以直接输webpack命令
+npm install -g webpack
+//在本项目中安装webpack，--save-dev的意思是将依赖写入项目的package.json文件
+npm install --save-dev webpack
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;#####4.创建webpack.config.js配置文件
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;module.exports = { 
+  entry: __dirname + &quot;/wap/main.js&quot;,//唯一入口文件，就像Java中的main方法 
+  output: {//输出目录 
+      path: __dirname + &quot;/build&quot;,//打包后的js文件存放的地方 
+      filename: &quot;bundle.js&quot;//打包后的js文件名 
+  }
+};
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    &lt;p&gt;运行&lt;code class=&quot;highlighter-rouge&quot;&gt;webpack&lt;/code&gt;，webpack非全局安装需输入&lt;code class=&quot;highlighter-rouge&quot;&gt;node_modules/.bin/webpack&lt;/code&gt;
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-c8032cf277d955ad.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;webpack打包成功.png&quot; /&gt;
+看到以上提示说明打包成功了，可以看到build目录下的bundle.js里多了很多自动生成的代码，但预览index.html却什么都没有看到，这是因为还没有往页面中写入内容。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;#####5.更方便地执行打包命令
+执行类似于&lt;code class=&quot;highlighter-rouge&quot;&gt;node_modules/.bin/webpack&lt;/code&gt;这样的命令其实是比较烦人且容易出错的，不过值得庆幸的是npm可以引导任务执行，对其进行配置后可以使用简单的npm start命令来代替这些繁琐的命令。在package.json中对npm的脚本部分进行相关设置即可，设置方法如下。
+打开package.json，找到script代码块，更改为：
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&quot;scripts&quot;: { 
+  &quot;build&quot;: &quot;webpack&quot;
+  或者
+  &quot;start&quot;:&quot;webpack&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    &lt;p&gt;但是start是一个特殊的脚本名称，如果脚本名称不是start，则需要&lt;code class=&quot;highlighter-rouge&quot;&gt;npm run (script name)&lt;/code&gt;，如&lt;code class=&quot;highlighter-rouge&quot;&gt;npm run build&lt;/code&gt;，但是start可以直接执行&lt;code class=&quot;highlighter-rouge&quot;&gt;npm start&lt;/code&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;#####6.使用Source Maps，使调试更容易&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;devtool选项&lt;/th&gt;
+      &lt;th&gt;配置结果&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;source-map&lt;/td&gt;
+      &lt;td&gt;在一个单独的文件中产生一个完整且功能完全的文件。这个文件具有最好的source map，但是它会减慢打包文件的构建速度&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;cheap-module-source-map&lt;/td&gt;
+      &lt;td&gt;在一个单独的文件中生成一个不带列映射的map，不带列映射提高项目构建速度，但是也使得浏览器开发者工具只能对应到具体的行，不能对应到具体的列（符号），会对调试造成不便&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;eval-source-map&lt;/td&gt;
+      &lt;td&gt;使用eval打包源文件模块，在同一个文件中生成干净的完整的source map。这个选项可以在不影响构建速度的前提下生成完整的sourcemap，但是对打包后输出的JS文件的执行具有性能和安全的隐患。不过在开发阶段这是一个非常好的选项，但是在生产阶段一定不要用这个选项&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;cheap-module-eval-source-map&lt;/td&gt;
+      &lt;td&gt;这是在打包文件时最快的生成source map的方法，生成的Source Map 会和打包后的JavaScript文件同行显示，没有列映射，和eval-source-map选项具有相似的缺点&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;正如上表所述，上述选项由上到下打包速度越来越快，不过同时也具有越来越多的负面作用，较快的构建速度的后果就是对打包后的文件的的执行有一定影响。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;在学习阶段以及在小到中性的项目上，eval-source-map是一个很好的选项，不过记得只在开发阶段使用它，继续上面的例子，进行如下配置&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/webpack.config.js
+module.exports = { 
+    devtool: 'eval-source-map',//生成Source Maps,这里选择eval-source-map 
+    entry: __dirname + '/app/main.js',//唯一入口文件,__dirname是node.js中的一个全局变量，它指向当前执行脚本所在的目录 
+    output: {//输出目录 
+        path: __dirname + '/build',//打包后的js文件存放的地方 
+        filename: 'bundle.js'//打包后输出的js的文件名 
+    }
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;#####7.安装React、Babel
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;npm install react --save-dev
+npm install react-dom --save-dev
+npm install babel-core --save-dev
+npm install babel-loader --save-dev
+npm install babel-preset-es2015 --save-dev
+npm install babel-preset-react --save-dev
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    &lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-489388792f567e65.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;基本插件安装成功之后的package.json.png&quot; /&gt;
+在webpack.config.js中&lt;/p&gt;
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/webpack.config.js
+module.exports = { 
+  devtool: 'eval-source-map',//生成Source Maps,这里选择eval-source-map 
+  entry: __dirname + '/app/main.js',//唯一入口文件,__dirname是node.js中的一个全局变量，它指向当前执行脚本所在的目录 
+  output: {//输出目录 
+      path: __dirname + '/build',//打包后的js文件存放的地方 
+      filename: 'bundle.js'//打包后输出的js的文件名 
+  },
+  module: {    //loaders加载器    
+      loaders: [{            
+          test: /\.(js|jsx)$/,//一个匹配loaders所处理的文件的拓展名的正则表达式，这里用来匹配js和jsx文件（必须）            
+          exclude: /node_modules/,//屏蔽不需要处理的文件（文件夹）（可选）            
+          loader: 'babel'//loader的名称（必须）        
+      }]
+  }
+};
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    &lt;p&gt;在项目根目录下新建.babelrc文件，没错你没看错，就是只有后缀名的文件，添加如下代码：&lt;/p&gt;
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;//.babelrc
+{ 
+  &quot;presets&quot;: [ 
+      &quot;react&quot;,
+      &quot;es2015&quot; 
+  ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;#####8.编写页面文件，为后续测试功能做准备
+&lt;code class=&quot;highlighter-rouge&quot;&gt;wap/main.js&lt;/code&gt;
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import React from 'react';
+import ReactDom from 'react-dom';
+import Component1 from './components/dialog.jsx';
+ReactDom.render(    
+  &amp;lt;Component1 /&amp;gt;,    
+  document.getElementById('content')
+);
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;wap/components/dialog.js&lt;/code&gt;&lt;/p&gt;
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import React from 'react';
+class Dialog extends React.Component {    
+  render() {        
+      return (            
+          &amp;lt;div&amp;gt;Hello World!&amp;lt;/div&amp;gt;        
+      )    
+  }
+}
+//导出组件
+export default Dialog;
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;build/index.html&lt;/code&gt;
+```
+&amp;lt;!DOCTYPE html&amp;gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;    
+    &lt;meta charset=&quot;UTF-8&quot; /&gt;    
+    &lt;title&gt;Title&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;    
+    &lt;div id=&quot;content&quot;&gt;&lt;/div&gt;    
+    &lt;script src=&quot;bundle.js&quot;&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;我使用的编辑器是webstorm，上述步骤完成之后，执行`npm start`，打包成功后，运行index.html，可以看到页面上
+![成功运行.png](http://upload-images.jianshu.io/upload_images/1874069-eaa2c46bc0dcb668.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+* #####9.安装并启用webpack-dev-server
+
+执行到这一步，基本的运作是可以了，但是每次修改文件之后，都需要重新打包，再运行，才可以看到新的内容，如何能忍受这么low的执行过程呢？
+
+我们可以使用webpack-dev-server来搭建本地开发服务器，webpack-dev-server允许我们可以把本地项目跑在像nginx那样的web服务器上，修改代码后，立即可以看到变化；所见即所得，大大增加开发效率。
+
+安装webpack-dev-server
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;npm install webpack-dev-server -g
+npm install webpack-dev-server –save-dev&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;更改packaje.json中的代码块
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;“scripts”: { 
+    “start”: “webpack”, 
+    “dev”: “webpack-dev-server –devtool eval –progress –colors –content-base build”
+}&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ps：dev里各属性值的意思是：
+&amp;gt;* webpack-dev-server: 在 localhost:8080 建立一个 Web 服务器
+&amp;gt;*  --devtool eval:为你的代码创建源地址。当有任何报错的时候可以让你更加精确地定位到文件和行号
+&amp;gt;*  --progress: 显示合并代码进度
+&amp;gt;*  --colors: 在命令行中显示颜色
+&amp;gt;* --content-base build:指向设置的输出目录
+
+在webpack.config.js中配置webpack-dev-server，在这里需要修改下entry的路径，给它加一个webpack/hot/dev-server，这里会用到Hot Module Replacement（热替换）插件，所以需要增加这个前缀，后文会提到，代码如下：
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;//webpack.config.js
+module.exports = { 
+    devtool: ‘eval-source-map’,//生成Source Maps,这里选择eval-source-map 
+    entry: [‘webpack/hot/dev-server’, __dirname + ‘/app/main.js’],//唯一入口文件,__dirname是node.js中的一个全局变量，它指向当前执行脚本所在的目录 
+    output: {//输出目录 
+        path: __dirname + ‘/build’,//打包后的js文件存放的地方 
+        filename: ‘bundle.js’//打包后输出的js的文件名 
+    }, 
+    module: { //loaders加载器 
+        loaders: [ { 
+            test: /.(js|jsx)$/,//一个匹配loaders所处理的文件的拓展名的正则表达式，这里用来匹配js和jsx文件（必须） 
+            exclude: /node_modules/,//屏蔽不需要处理的文件（文件夹）（可选） 
+            loader: ‘babel’//loader的名称（必须） 
+        } ] 
+    }, 
+    //webpack-dev-server配置 
+    devServer: { 
+        contentBase: ‘./build’,//默认webpack-dev-server会为根文件夹提供本地服务器，如果想为另外一个目录下的文件提供本地服务器，应该在这里设置其所在目录（本例设置到”build”目录） 
+        colors: true,//在cmd终端中输出彩色日志 
+        historyApiFallback: true,//在开发单页应用时非常有用，它依赖于HTML5 history API，如果设置为true，所有的跳转将指向index.html 
+        inline: true,//设置为true，当源文件改变时会自动刷新页面 
+        port: 8080,//设置默认监听端口，如果省略，默认为”8080” 
+        process: true,//显示合并代码进度 
+    }
+};&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;在浏览器中打开`http://localhost:8080/`，如果页面上是空白的，没有内容，按F12打开控制台，可以清除地看到错误提示：`Uncaught Error: [HMR] Hot Module Replacement is disabled`
+现在我们来安装和配置这个Hot Module Replacement。
+* #####10.Hot Module Replacement
+
+Hot Module Replacement（HMR）是webpack里很有用的一个插件，它允许你在修改组件代码后，自动刷新实时预览修改后的效果。
+在webpack中实现HMR也很简单，只需要做两项配置
+&amp;gt;1.在webpack配置文件中添加HMR插件；
+2.在Webpack Dev Server中添加“hot”参数；
+
+不过配置完这些后，JS模块其实还是不能自动热加载的，还需要在你的JS模块中执行一个Webpack提供的API才能实现热加载，虽然这个API不难使用，但是如果是React模块，使用我们已经熟悉的Babel可以更方便的实现功能热加载。
+整理下我们的思路，具体实现方法如下
+&amp;gt;* Babel和webpack是独立的工具
+* 二者可以一起工作
+* 二者都可以通过插件拓展功能
+*  HMR是一个webpack插件，它让你能浏览器中实时观察模块修改后的效果，但是如果你想让它工作，需要对模块进行额外的配额；
+* Babel有一个叫做react-transform-hrm的插件，可以在不对React模块进行额外的配置的前提下让HMR正常工作；
+
+在webpack.config.js中配置如下：
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;//webpack.config.js
+var webpack = require(‘webpack’)
+module.exports = { 
+    devtool: ‘eval-source-map’,//生成Source Maps,这里选择eval-source-map 
+    entry: [‘webpack/hot/dev-server’, __dirname + ‘/app/main.js’],//唯一入口文件,__dirname是node.js中的一个全局变量，它指向当前执行脚本所在的目录 
+    output: {//输出目录 
+        path: __dirname + ‘/build’,//打包后的js文件存放的地方 
+        filename: ‘bundle.js’//打包后输出的js的文件名 
+    }, 
+    module: { //loaders加载器 
+        loaders: [ { 
+            test: /.(js|jsx)$/,//一个匹配loaders所处理的文件的拓展名的正则表达式，这里用来匹配js和jsx文件（必须） 
+            exclude: /node_modules/,//屏蔽不需要处理的文件（文件夹）（可选） 
+            loader: ‘babel’//loader的名称（必须） 
+        } ] 
+    }, 
+    plugins: [  &lt;br /&gt;
+        new webpack.HotModuleReplacementPlugin()//热模块替换插件
+    ],
+    //webpack-dev-server配置 
+    devServer: { 
+        contentBase: ‘./build’,//默认webpack-dev-server会为根文件夹提供本地服务器，如果想为另外一个目录下的文件提供本地服务器，应该在这里设置其所在目录（本例设置到”build”目录） 
+        colors: true,//在cmd终端中输出彩色日志 
+        historyApiFallback: true,//在开发单页应用时非常有用，它依赖于HTML5 history API，如果设置为true，所有的跳转将指向index.html 
+        inline: true,//设置为true，当源文件改变时会自动刷新页面 
+        port: 8080,//设置默认监听端口，如果省略，默认为”8080” 
+        process: true,//显示合并代码进度 
+    }
+};&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;现在可以正常工作了，运行`npm run dev`，待命令行提示`webpack: bundle is now VALID`后，在浏览器中输入`http://localhost:8080`，可以看到，正常显示Hello World
+如果觉得这样不放心，让我们进行如下额外配置
+
+安装react-transform-hmr，在不对React模块进行额外的配置的前提下让HMR正常工作
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;npm install –save-dev babel-plugin-react-transform react-transform-hmr&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;在.babelrc文件里配置babel，注意这里有一堆括号，别写错了
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;//.babelrc
+{ 
+    “presets”: [ 
+        “react”, 
+        “es2015” 
+    ], 
+    “env”: { 
+        “development”: { 
+            “plugins”: [ 
+                [ 
+                    “react-transform”, { 
+                        “transforms”: [{ 
+                                “transform”: “react-transform-hmr”, 
+                                “imports”: [ “react” ], 
+                                “locals”: [ “module” ] 
+                        }] 
+                    }
+                ]
+             ]
+         } 
+    }
+}
+```
+至此，已经用webpack构建好了React项目的基础依赖，可以愉快的开发React程序了。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;由于内容太多，于是将本文分成了多个部分，下一部分&lt;a href=&quot;http://www.jianshu.com/p/dce81ab8940f&quot;&gt;Webpack+React+多语言(二) 插件配置+多语言&lt;/a&gt;
+github地址：&lt;a href=&quot;https://github.com/AveSore/webpack-react-language&quot;&gt;webpack-react-language&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;</content><author><name></name></author><summary type="html">已经看过这一节的朋友，可以看Webpack+React+多语言(二) 插件配置+多语言 github地址：webpack-react-language 关键字：react 多语言 国际版 React-intl</summary></entry><entry><title type="html">Grunt安装与环境配置</title><link href="http://localhost:4000/2016/12/22/Grunt%E5%AE%89%E8%A3%85%E4%B8%8E%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE.html" rel="alternate" type="text/html" title="Grunt安装与环境配置" /><published>2016-12-22T00:00:00+08:00</published><updated>2016-12-22T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/22/Grunt%E5%AE%89%E8%A3%85%E4%B8%8E%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE</id><content type="html" xml:base="http://localhost:4000/2016/12/22/Grunt%E5%AE%89%E8%A3%85%E4%B8%8E%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE.html">&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Grunt 依赖 Node.js 所以在安装之前确保你安装了 Node.js。然后开始安装 Grunt&lt;/code&gt;
+&lt;code class=&quot;highlighter-rouge&quot;&gt;实际上，安装的并不是 Grunt，而是 Grunt-cli，也就是命令行的 Grunt，这样你就可以使用 grunt 命令来执行某个项目中的 Gruntfile.js 中定义的 task 。但是要注意，Grunt-cli 只是一个命令行工具，用来执行，而不是 Grunt 这个工具本身&lt;/code&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;项目的github地址：&lt;a href=&quot;https://github.com/AveSore/grunt_test&quot;&gt;grunt_test&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;####1.安装node
+&lt;a href=&quot;http://www.runoob.com/nodejs/nodejs-install-setup.html&quot;&gt;node.js安装教程&lt;/a&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;####2.grunt命令行（CLI） 安装在全局环境下，所以命令是这么写滴！
+    &lt;blockquote&gt;
+      &lt;p&gt;npm install -g grunt-cli&lt;/p&gt;
+    &lt;/blockquote&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;####3.新建一个项目，名字叫grunt_test：注意，千万不要叫grunt，后面运行grunt命令的时候会出错
+下面是我的项目目录
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-b689a858fbbbbe51.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;QQ截图20161222155458.png&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;####4.生成package.json，也可以手动生成这样一个文件
+    &lt;blockquote&gt;
+      &lt;p&gt;npm init&lt;/p&gt;
+    &lt;/blockquote&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;生成之后在里面填入以下内容
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-205e8540ce72003f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;package.json.png&quot; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;####5.安装grunt
+    &lt;blockquote&gt;
+      &lt;p&gt;nam install grunt –save-dev  注意查看package.json文件&lt;/p&gt;
+    &lt;/blockquote&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-72c7021806151060.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;grunt安装成功.png&quot; /&gt;
+偶？自动把grunt的版本号加上啦。对啦，这就是–save-dev的作用&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;####6.安装grunt插件&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;js语法检查:&lt;a href=&quot;https://github.com/gruntjs/grunt-contrib-jshint&quot;&gt;grunt-contrib-jshint&lt;/a&gt;     &lt;br /&gt;
+安装命令：npm install grunt-contrib-jshint –save-dev 下同
+css语法检查：&lt;a href=&quot;https://github.com/gruntjs/grunt-contrib-csslint&quot;&gt;grunt-contrib-csslint&lt;/a&gt;
+合并文件：&lt;a href=&quot;https://github.com/gruntjs/grunt-contrib-concat&quot;&gt;grunt-contrib-concat&lt;/a&gt;
+js压缩文件：&lt;a href=&quot;https://github.com/gruntjs/grunt-contrib-uglify&quot;&gt;grunt-contrib-uglify&lt;/a&gt;
+css压缩文件：&lt;a href=&quot;https://github.com/gruntjs/grunt-contrib-cssmin&quot;&gt;grunt-contrib-cssmin&lt;/a&gt;
+image压缩文件：&lt;a href=&quot;https://github.com/gruntjs/grunt-contrib-imagemin&quot;&gt;grunt-contrib-imagemin&lt;/a&gt;
+html压缩文件：&lt;a href=&quot;https://github.com/gruntjs/grunt-contrib-htmlmin&quot;&gt;grunt-contrib-htmlmin&lt;/a&gt;
+Sass\Scss 编译：&lt;a href=&quot;https://github.com/gruntjs/grunt-contrib-sass&quot;&gt;grunt-contrib-sass&lt;/a&gt; 
+安装sass插件后，我运行grunt，发现报错，提示ruby没有安装，所以如果需要使用到这个插件的，要确保自己的电脑上是否有装ruby，没有的话要进行安装
+&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo yum install ruby&lt;/code&gt; # CentOS, Fedora, 或 RHEL 系统
+&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo apt-get install ruby-full&lt;/code&gt; # Debian 或 Ubuntu 系统
+&lt;code class=&quot;highlighter-rouge&quot;&gt;brew install ruby&lt;/code&gt; #苹果系统
+Less 编译：&lt;a href=&quot;https://github.com/gruntjs/grunt-contrib-less&quot;&gt;grunt-contrib-less&lt;/a&gt;
+ 监听文件变动：&lt;a href=&quot;https://github.com/gruntjs/grunt-contrib-watch&quot;&gt;grunt-contrib-watch&lt;/a&gt;
+建立本地服务器：&lt;a href=&quot;https://github.com/gruntjs/grunt-contrib-connect&quot;&gt;grunt-contrib-connect&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;上面这些插件都安装好后，注意看package.json文件中的内容
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-f383e920c8ff6bfb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;grunt插件安装成功.png&quot; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;####7.配置Gruntfile.js&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这里是对每个需要的插件进行配置
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-0a78bb72b0321f7b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;grunt.initConfig.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;插件太多了，挑其中一个(uglify，用于js压缩)进行详细说明
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-7e522aab42aa9560.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;grunt-contrib-uglify.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;grunt是任务机制，我在这里给定了combine、compress、fileCompress三个任务，执行grunt时会按顺序执行三个任务&lt;/p&gt;
+&lt;blockquote&gt;
+
+  &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;uglify:{    
+    options:{        
+        sourceMap: false,        
+        stripBanners: true,        
+        //压缩后的文件注释信息        
+        banner :'/*! &amp;lt;%=pkg.name%&amp;gt;-&amp;lt;%=pkg.version%&amp;gt;.js &amp;lt;%= grunt.template.today(&quot;yyyy-mm-dd&quot;) %&amp;gt; */\n',        
+        footer:'\n/*!修改于&amp;lt;%= grunt.template.today(&quot;yyyy-mm-dd&quot;) %&amp;gt;  */'    
+    },    
+    combine: {        
+        files: {           
+             'build/static/js/compress-&amp;lt;%= pkg.name %&amp;gt;-&amp;lt;%= pkg.version %&amp;gt;.min.js': ['dev/static/js/*.common.js'],            
+            'build/static/js/compress.common.min.js': ['dev/static/js/*/*.common.js']        
+        }    
+    },    
+    compress:{        
+        options:{            
+            report:&quot;min&quot;,
+        },        
+        files:[{                
+                expand:true,                
+                cwd:'dev/static/js',                
+                src:['*.js','!*.min.js','!*.common.js'],                
+                dest:'build/static/js',                
+                ext:'.min.js'           
+        }]    
+    },    
+    fileCompress:{        
+        options:{                 
+        },        
+        files:[{                
+            expand:true,                
+            cwd:'dev/static/js',                
+            src:['**/*.js','!**/*.min.js','!**/*.common.js'],                
+            dest:'build/static/js/',                
+            ext:'.min.js'            
+        }]    
+    }
+},
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/div&gt;
+  &lt;p&gt;uglify:combine 用来合并文件
+uglify:compress用来压缩文件
+uglify:fileCompress也是用来压缩文件
+下面两个的区别在于 files中的src：&lt;em&gt;*/&lt;/em&gt;.js用来匹配所有的js，注意，输出的时候会保留目录层次，如果是合并到一个文件中，就把dest写成
+dest: ‘build/static/js/common.js’，并且不写ext就可以&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;grunt配置总体图
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-aadff3927fdd3e40.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;grunt配置一览图.png&quot; /&gt;
+最后一行代码是注册任务，当然，除了default，我们也可以注册到别的Task上去，比如&lt;code class=&quot;highlighter-rouge&quot;&gt;grunt.registerTask('compress', ['uglify:build']);&lt;/code&gt;
+如果想要执行这个 task，我们就不能只输入 &lt;code class=&quot;highlighter-rouge&quot;&gt;grunt&lt;/code&gt; 命令了，我们需要输入 &lt;code class=&quot;highlighter-rouge&quot;&gt;grunt compress&lt;/code&gt;命令来执行这条 task，而这条 task 的任务是 uglify 下面的 build 任务，也就是说，我们只会执行 uglify 里面 build 定义的任务，而不会执行 uglify 里面定义的其他任务。
+&lt;strong&gt;这里需要注意的是，task 的命名不能与后面的任务配置同名，也就是说这里的 compress 不能命名成 uglify，这样会报错或者产生意外情况&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;####8.运行查看效果
+在grunt_test目录下，运行grunt，我现在是默认执行uncss和htmlmin&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-a190fe4ae3aa6974.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;grunt_done.png&quot; /&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;详细代码放在github上面了，链接地址：&lt;a href=&quot;https://github.com/AveSore/grunt_test&quot;&gt;grunt_test&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;</content><author><name></name></author><summary type="html">Grunt 依赖 Node.js 所以在安装之前确保你安装了 Node.js。然后开始安装 Grunt 实际上，安装的并不是 Grunt，而是 Grunt-cli，也就是命令行的 Grunt，这样你就可以使用 grunt 命令来执行某个项目中的 Gruntfile.js 中定义的 task 。但是要注意，Grunt-cli 只是一个命令行工具，用来执行，而不是 Grunt 这个工具本身 项目的github地址：grunt_test</summary></entry><entry><title type="html">火狐浏览器获取不到iconfont</title><link href="http://localhost:4000/2016/12/19/%E7%81%AB%E7%8B%90%E6%B5%8F%E8%A7%88%E5%99%A8%E8%8E%B7%E5%8F%96%E4%B8%8D%E5%88%B0iconfont.html" rel="alternate" type="text/html" title="火狐浏览器获取不到iconfont" /><published>2016-12-19T00:00:00+08:00</published><updated>2016-12-19T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/19/%E7%81%AB%E7%8B%90%E6%B5%8F%E8%A7%88%E5%99%A8%E8%8E%B7%E5%8F%96%E4%B8%8D%E5%88%B0iconfont</id><content type="html" xml:base="http://localhost:4000/2016/12/19/%E7%81%AB%E7%8B%90%E6%B5%8F%E8%A7%88%E5%99%A8%E8%8E%B7%E5%8F%96%E4%B8%8D%E5%88%B0iconfont.html">&lt;p&gt;可能的原因是：firefox（28.0）对icon font的目录解析bug导致出现问题。&lt;/p&gt;
+
+&lt;p&gt;我尝试着调整CSS文件的位置以及icon font文件的位置，以期找到问题的真正原因。我做了很多次调整，但是从这些结果中我不能总结出一个满意的规律来。自己也觉得很懊恼。在这里只能给个勉强的解决方法：就是把icon font对应的CSS文件和icon font文件都放在也HTML同级目录或者子目录下，然后正确的引入即可。
+ 我引入CSS文件的代码：&lt;/p&gt;
+&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;moz/font_madtry.css&quot; /&gt;
+
+&lt;p&gt;我的icon font文件引入代码：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+@font-face{    
+  font-family:'madtry';    
+  src: url('fonts/madtry.eot'); /* IE 9 */    
+  src: url('fonts/madtry.eot#iefix') format('embedded-opentype'), /* IE6-8 */ 
+        url('fonts/madtry.woff') format('woff'),  /* Chrome firefox */
+        url('fonts/madtry.ttf') format('truetype'), /* Chrome firefox opera  andriod ios4.2 */        
+        url('fonts/madtry.svg#madtry') format('svg'); /* ios4.1 */
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;</content><author><name></name></author><summary type="html">可能的原因是：firefox（28.0）对icon font的目录解析bug导致出现问题。</summary></entry><entry><title type="html">Phpstorm Watcher</title><link href="http://localhost:4000/2016/12/19/phpstorm-watcher.html" rel="alternate" type="text/html" title="Phpstorm Watcher" /><published>2016-12-19T00:00:00+08:00</published><updated>2016-12-19T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/19/phpstorm-watcher</id><content type="html" xml:base="http://localhost:4000/2016/12/19/phpstorm-watcher.html">&lt;p&gt;&lt;img src=&quot;https://app.yinxiang.com/shard/s64/res/14963215-29d4-4583-aa8e-8d25d1363a3b.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Program&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;C:\Users\bongmi\AppData\Roaming\npm\jade.cmd&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Arguments&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;-P $FileName$ –pretty –out $FileParentDir$\template\&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://app.yinxiang.com/shard/s64/res/1c609a6a-7b53-44fa-9c53-d2db54df3aed.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Program&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;C:\Ruby23\bin\scss.bat&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Arguments&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;–no-cache –update $FileName$:$FileParentDir$\css$FileNameWithoutExtension$.css
+Output paths to refresh
+$FileNameWithoutExtension$.css:$FileNameWithoutExtension$.css.map&lt;/p&gt;
+&lt;/blockquote&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Gitlab配置ssh Key</title><link href="http://localhost:4000/2016/12/19/gitlab%E9%85%8D%E7%BD%AEssh-key.html" rel="alternate" type="text/html" title="Gitlab配置ssh Key" /><published>2016-12-19T00:00:00+08:00</published><updated>2016-12-19T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/19/gitlab%E9%85%8D%E7%BD%AEssh-key</id><content type="html" xml:base="http://localhost:4000/2016/12/19/gitlab%E9%85%8D%E7%BD%AEssh-key.html">&lt;p&gt;1.下载乌龟&lt;br /&gt;
+2.乌龟生成和保存的是私钥，而现在这边需要用到公钥，可以在命令行下面拉取代码&lt;/p&gt;
+
+&lt;p&gt;生成SSH密钥：https://git-scm.com/book/zh/v1/%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E7%9A%84-Git-%E7%94%9F%E6%88%90-SSH-%E5%85%AC%E9%92%A5
+git.bongmi.cn “Profile Setting”–&amp;gt; “SSH keys” 添加密匙（格式为：ssh-rsa XXXXXXXXXXXX）&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://app.yinxiang.com/shard/s64/res/b5dc4712-0971-4b39-9e6c-b2ab7db11c4b/L0IWP9_%24L8%5B%40KNS%5B%24BU5E%29G.png&quot; alt=&quot;&quot; /&gt;
+&lt;img src=&quot;https://app.yinxiang.com/shard/s64/res/6f9a0409-b9f3-4541-8ebb-13c9b045e8c6/KYV%5DDY%40Q%5DD%7DL%40ZEX%40LJ8G.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;最后把 cat命令行下的公钥复制到gitlab中的ssh-key中，会自动生成title,然后保存，就可以在命令行中拉取项目代码了&lt;/p&gt;</content><author><name></name></author><summary type="html">1.下载乌龟 2.乌龟生成和保存的是私钥，而现在这边需要用到公钥，可以在命令行下面拉取代码</summary></entry><entry><title type="html">再谈css 预处理器</title><link href="http://localhost:4000/2016/12/15/%E5%86%8D%E8%B0%88CSS-%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8.html" rel="alternate" type="text/html" title="再谈css 预处理器" /><published>2016-12-15T00:00:00+08:00</published><updated>2016-12-15T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/15/%E5%86%8D%E8%B0%88CSS-%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8</id><content type="html" xml:base="http://localhost:4000/2016/12/15/%E5%86%8D%E8%B0%88CSS-%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8.html">&lt;p&gt;再谈CSS 预处理器
+&lt;em&gt;2016-09-09&lt;/em&gt; &lt;em&gt;Justineo&lt;/em&gt; JavaScript
+转自：http://efe.baidu.com/blog/revisiting-css-preprocessors/&lt;/p&gt;
+
+&lt;p&gt;CSS 预处理器是什么？一般来说，它们基于 CSS 扩展了一套属于自己的 DSL，来解决我们书写 CSS 时难以解决的问题：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;语法不够强大，比如无法嵌套书写导致模块化开发中需要书写很多重复的选择器；&lt;/li&gt;
+  &lt;li&gt;没有变量和合理的样式复用机制，使得逻辑上相关的属性值必须以字面量的形式重复输出，导致难以维护。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;所以这就决定了 CSS 预处理器的主要目标：提供 CSS 缺失的样式层复用机制、减少冗余代码，提高样式代码的可维护性。这不是锦上添花，而恰恰是雪中送炭。&lt;/p&gt;
+
+&lt;p&gt;网上已经有不少对比目前最主流的三个预处理器 Less、Sass 和 Stylus（按字母顺序排名）的文章了，但是似乎都不是很详细，或者内容有些过时。下面我会更详细地探讨一下这三种预处理器的特性和它们的差异。&lt;/p&gt;
+
+&lt;p&gt;下面主要会分为如下几方面来讨论：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;基本语法&lt;/li&gt;
+  &lt;li&gt;嵌套语法&lt;/li&gt;
+  &lt;li&gt;变量&lt;/li&gt;
+  &lt;li&gt;@import&lt;/li&gt;
+  &lt;li&gt;混入&lt;/li&gt;
+  &lt;li&gt;继承&lt;/li&gt;
+  &lt;li&gt;函数&lt;/li&gt;
+  &lt;li&gt;逻辑控制&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;事先声明一下，平时我在开发中主要使用的是 Less，所以可能对 Sass 和 Stylus 的熟悉程度稍差一些，比较时主要参考三者官网的语言特性说明，有一些正在开发的功能可能会遗漏。
+###基本语法
+Less 的基本语法属于「CSS 风格」，而 Sass、Stylus 相比之下激进一些，利用缩进、空格和换行来减少需要输入的字符。不过区别在于 Sass、Stylus 同时也兼容「CSS 风格」代码。多一种选择在更灵活的同时，在团队开发中也免不了增加更多约定来保持风格统一。而对个人而言，语法风格按自己口味选择即可。&lt;/p&gt;
+
+&lt;p&gt;注：后面的 Sass 代码会用被更多人接受的 SCSS 风格给出。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Less &amp;amp; SCSS：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;.box {
+    display: block;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Sass：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;.box
+    display: block&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Stylus：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;.box
+    display: block&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;###嵌套语法
+三者的嵌套语法都是一致的，甚至连引用父级选择器的标记 &amp;amp; 也相同。区别只是 Sass 和 Stylus 可以用没有大括号的方式书写。以 Less 为例：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.a {
+    &amp;amp;.b {
+        color: red;
+    }
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;生成的 CSS 为：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.a.b {
+    color: red;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;除了规则集的嵌套，Sass 额外提供了一个我个人认为比较另（jī）类（lèi）的「属性嵌套」：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.funky {
+    font: {
+        family: fantasy;
+        size: 30em;
+        weight: bold;
+    }
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;###选择器引用
+三者都支持用 &amp;amp; 在嵌套的规则集中引用上层的选择器，这可以是嵌套书写 CSS 时的「惯例」了。语法相同，但是逻辑上有些许差异。在一个选择器中用两次以上 &amp;amp; 且父选择器是一个列表时，Less 会对选择器进行排列组合，而 Sass 和 Stylus 不会这么做。&lt;/p&gt;
+
+&lt;p&gt;也就是说，假设上层选择器为 .a, .b，则内部的 &amp;amp; &amp;amp; 在 Less 中会成为 .a .a, .a .b, .b .a, .b .b，而 Sass 和 Stylus 则输出 .a .a, .b .b。&lt;/p&gt;
+
+&lt;p&gt;假设我们要用预处理器书写 WHATWG 推荐的 section 标题样式，在 Less 中可以方便地书写为：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;article, aside, nav, section {
+  h1 {
+    margin-top: 0.83em; margin-bottom: 0.83em; font-size: 1.50em;
+  }
+  &amp;amp; &amp;amp; h1 {
+    margin-top: 1.00em; margin-bottom: 1.00em; font-size: 1.17em;
+  }
+  &amp;amp; &amp;amp; &amp;amp; h1 {
+    margin-top: 1.33em; margin-bottom: 1.33em; font-size: 1.00em;
+  }
+  &amp;amp; &amp;amp; &amp;amp; &amp;amp; h1 {
+    margin-top: 1.67em; margin-bottom: 1.67em; font-size: 0.83em;
+  }
+  &amp;amp; &amp;amp; &amp;amp; &amp;amp; &amp;amp; h1 {
+    margin-top: 2.33em; margin-bottom: 2.33em; font-size: 0.67em;
+  }
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;当然，这个推荐样式十分脑残，编译出来的结果会有 47KB 之巨，根本不可用，这里只是借来演示一下。
+除了 &amp;amp;，Sass 和 Stylus 更进一步，分别用 @at-root 和 / 符号作为嵌套时「根」规则集的选择器引用。这有什么用呢？举个例子，假设 HTML 结构是这样的：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;`&amp;lt;article class=&quot;post&quot;&amp;gt;
+    &amp;lt;h1&amp;gt;我是一篇文章&amp;lt;/h1&amp;gt;
+    &amp;lt;section&amp;gt;
+        &amp;lt;h1 class=&quot;section-title&quot;&amp;gt;&lt;a href=&quot;#s1&quot; class=&quot;section-link&quot;&gt;#&lt;/a&gt;我是章节标题&amp;lt;/h1&amp;gt;
+        &amp;lt;p&amp;gt;我只是一个&lt;em&gt;例子&lt;/em&gt;。&amp;lt;/p&amp;gt;
+    &amp;lt;/section&amp;gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&amp;lt;/article&amp;gt;`&lt;/p&gt;
+
+&lt;p&gt;如果我这么写 Sass 代码，是完全符合业务的嵌套关系的：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.post {
+    section {
+        .section-title {
+            color: #333;
+            .section-link {
+                color: #999;
+            }
+        }
+        /* other section styles */
+    }
+    /* other post styles */
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;但是这样生成出来的选择器会有 .post section .section-title .section-link，很多时候我们觉得写成 .post .section-link 就够了。
+于是我们在 Stylus 中可以这么写：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.post
+    section
+        .section-title
+           color #333 /.post 
+    .section-link
+        color #999
+        /* other section styles */
+    /* other post styles */&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这样输出的 CSS 就会是：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.post section .section-title {
+    color: #333;
+}
+.post .section-link {
+    color: #999;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这就是我们想要的样子了。当然也可以这样写：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.post
+  section
+    .section-title
+      color #333
+  /* other section styles */
+  .section-link
+    color #999
+  /* other post styles */&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;我个人是推荐这种写法（不使用 root 引用）的，因为当你确定 .section-link 的样式不依赖于它位于 section 或 .section-title 下时，就不应该嵌套于此。否则如果为了一点点性能上的考虑（还不一定会是优化），使得设计意图变得更不准确，我觉得得不偿失。
+###变量
+变量无疑为 CSS 增加了一种有效的复用方式，减少了原来在 CSS 中无法避免的重复「硬编码」。&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Less：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;@red: #c00;
+strong {
+    color: @red;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Sass：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;$red: #c00;
+strong {
+    color: $red;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Stylus：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;red = #c00
+strong
+    color: red&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Less 的选择有一个问题：@ 规则在 CSS 中可以算是一种「原生」的扩展方式，变量名用 @ 开头很可能会和以后的新 @ 规则冲突。（当然理论上只要 CSS 规范不引入 @a: b 这样的规则，问题也不大。而且规范制定的时候也会参考很多现有的实现。）&lt;/p&gt;
+
+&lt;p&gt;相比之下 Sass 的选择中规中矩，而 Stylus 就不同了，不需要额外的标志符。这意味着：在 Stylus 中，我们可以覆写 CSS 原生的属性值！Stylus 的设计让人有一种「你以为你在写 CSS，但其实你不是」的感觉，后面会有更多这样的例子。&lt;/p&gt;
+
+&lt;p&gt;顺便说一下，CSS 规范也有关于变量实现的草案，目前的方案是这个样子的：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;/* global scope */
+:root {
+    --red: #c00;
+}
+strong {
+    color: var(--red);
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;不管语法槽点如何，原生 CSS 变量可以通过 DOM 结构来继承，也就是说是代码真正「运行」时（runtime）决定的。元素引用一个变量时会按 DOM 向上查找定义在上层元素上的同名变量。这一点是任何预处理语言都无法做到的。可以用 Firefox 31+ 看一下这个 demo。至于这种机制是不是好用，暂时还没研究过。不过从开发的思维惯性来看，还很难一下子适应这种方式。
+###变量作用域
+三种预处理器的变量作用域都是按嵌套的规则集划分，并且在当前规则集下找不到对应变量时会逐级向上查找，注意这个和原生 CSS 的逻辑是完全不同的。&lt;/p&gt;
+
+&lt;p&gt;如果我们在代码中重写某个已经定义的变量的值，Less 的处理逻辑和其他两者有非常关键的区别。在 Less 中，这个行为被称为「懒加载（Lazy Loading）」。所有 Less 变量的计算，都是以这个变量最后一次被定义的值为准。举一个例子更容易说清楚：&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Less：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;@size: 10px;
+.box {
+    width: @size;
+}
+@size: 20px;
+.ball {
+    width: @size;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;输出：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.box {
+    width: 20px;
+}
+.ball {
+    width: 20px;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;而在 Stylus 中：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;size = 10px
+.box
+    width: size  &lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;size = 20px
+.ball
+    width: size&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;输出：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.box {
+  width: 10px;
+}
+.ball {
+  width: 20px;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Sass 的处理方式和 Stylus 相同，变量值输出时根据之前最近的一次定义计算。这其实代表了两种理念：Less 更倾向接近 CSS 的声明式，计算过程弱化调用时机；而 Sass 和 Stylus 更倾向于指令式。这两种方式会导致怎样的结果呢？&lt;/p&gt;
+
+&lt;p&gt;举个例子来说，对于 Less，如果项目中引入了这样一个文件：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+@error-color: #c00;
+@success-color: #0c0;
+.error {
+  color: @error-color;
+  background-color: lighten(@error-color, 40%);
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.success {
+  color: @success-color;
+  background-color: lighten(@success-color, 40%);
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;在业务代码中，在不修改外部引入文件的情况下，如果我想重写这两种状态的配色，只需要重新配置 @error-color 和 @success-color 这两个变量，就能改变 .error 和 .success 的样式。&lt;/p&gt;
+
+&lt;p&gt;而在 Stylus 中，如果引入的第三方样式库中有这样的代码：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;error-color = #c00
+success-color = #0c0&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.error
+    color: error-color
+    background-color: lighten(error-color, 40%)&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.success
+    color: success-color
+    background-color: lighten(success-color, 40%)&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这种情况下后面的代码就无法通过重写变量值来覆盖样式了。Sass 也是如此。优点是 Stylus 和 Sass 这样的处理会不容易受多个第三方库变量名冲突的影响，因为一个变量不能影响在定义它以前的输出样式。&lt;/p&gt;
+
+&lt;p&gt;由于 Sass 和 Stylus 变量在「运行」过程中使用完可以修改后再使用输出不同的值，所以这两者还提供了「仅当变量不存在时才赋值」的功能：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Sass：
+`
+$x: 1;
+$x: 5 !default;
+$y: 3 !default;
+// $x = 1, $y = 3`&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Stylus：
+ &lt;code class=&quot;highlighter-rouge&quot;&gt;x = 1
+x := 5 // or x ?= 5
+y = 3
+// x = 1, y = 3&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;因为变量只能在输出前修改才能生效，所以如果要定制第三方库的样式，用户代码理论上得插入第三方库的配置与样式之间才能生效。而有了 !default，第三方库在提供默认配置时可以将开发给用户修改的变量设置为 !default，这样只要用户提前引入配置进行覆盖，就可以按需重写默认配置了：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+// lib.scss
+$alert-color: red !default;
+.alert {
+    color: $alert-color;
+}
+// var.scss
+$alert-color: #c00;
+// page.scss
+@import var
+@import lib&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这样最终页面输出的效果就是被用户重定义过的内容了。&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;/* page.css */
+.alert {
+  color: #c00;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;由于 Less 处理变量的方式，如果我们要引入多个外部样式库或在多个团队进行合作开发时，如果不能确保开发过程可控，那为变量添加模块前缀就变得很有必要。&lt;/p&gt;
+
+&lt;p&gt;此外，Sass 中提供一个 !global 的语法来让局部变量变成全局变量，也就是说 Sass 代码可以在内层覆盖全局变量的值。输出一段局部的样式可能使得后续所有样式都受到全局变量变化的影响。
+###插值
+预处理器都有定义变量的功能，除了在最常见的属性值中使用，其他还有哪些地方能用变量来增强对样式的抽象、复用呢？&lt;/p&gt;
+
+&lt;p&gt;变量名插值&lt;/p&gt;
+
+&lt;p&gt;Less 中支持 @@foo 的形式引用变量，即该变量的名字是由 @foo 的值决定的。比如我们可以利用它简化更清晰地调用 mixin：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;// some icon font lib
+// variables with prefix to prevent conflicts
+@content-apple: &quot;A&quot;;
+@content-google: &quot;G&quot;;
+// clearer argument values
+.icon-content(@icon) {
+    @var: ~&quot;content-@{icon}&quot;;
+    &amp;amp;::before {
+        content: @@var;
+    }
+}
+.icon-apple {
+  .icon-content(apple); // &quot;A&quot;
+}
+.icon-google {
+  .icon-content(google); // &quot;G&quot;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;选择器插值&lt;/p&gt;
+
+&lt;p&gt;选择器是样式表和 DOM 的纽带，是我们实际暴露给 HTML 的接口。支持插值显然可以让接口更不容易和其他内容冲突。假设我们在开发一个 UI 库，生成的组件类名希望有一个可配置的前缀，这时选择器插值就变得相当重要。初看下来，三者用法类似：&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Less：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;@prefix: ui;
+.@{prefix}-button {
+  color: #333;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Sass：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;$prefix: ui
+.#{$prefix}-button
+    color: #333;&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Stylus：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;prefix = ui
+.{prefix}-button
+    color #333&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;但是在 Less 中，有一个很严重的问题：通过选择器插值生成的规则无法被继承（Extend dynamically generated selectors）！当然，如果有类似 Placeholder 的机制，这都不是事儿了。问题是 Less 没有！未来的方案看来可能是通过 :extend(.mixin()) 的方式实现类似功能（:extend mixins）。虽然用 :extend 本身的语法说不过去，但是在现有机制上来看还算可以接受。关于样式的继承复用，后面会详细讲到。&lt;/p&gt;
+
+&lt;p&gt;@import 语句插值
+Sass 中只能在使用 url() 表达式引入时进行变量插值：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$device: mobile;
+@import url(styles.#{$device}.css);&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Less 中可以在字符串中进行插值：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;@device: mobile;
+@import &quot;styles.@{device}.css&quot;;&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Stylus 中在这里插值不管用，但是可以利用其字符串拼接的功能实现：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;device = &quot;mobile&quot;
+@import &quot;styles.&quot; + device + &quot;.css&quot;&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;注意由于 Less 的 Lazy Load 特性，即使是 @import 也是可以在后面的文件内容中进行覆盖的，修改掉变量就可以在前面引入不同的外部文件。而 Sass 与 Stylus 一旦输出语句，就无法通过变量改变了。&lt;/p&gt;
+
+&lt;p&gt;属性名插值
+三个预处理器的目前版本都支持属性名插值，用法也类似。这里仅以 Stylus 为例：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;red-border(sides)
+    for side in sides
+    border-{side}-color: red // property name interpolation
+.x
+    red-border(top right)&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;输出：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.x {
+  border-top-color: #f00;
+  border-right-color: #f00;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;其他 @ 规则插值
+三种预处理器均支持在 @media、@keyframes、@counter-style 等规则中进行插值。@media 插值主要用来做响应式的配置，而 @keyframes 这样带名称名称的 @ 规则则可以通过插值来避免命名冲突。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Less：
+`
+@m: screen;
+@orient: landscape;
+@media @m and (orientation: @orient) {
+    body {
+        width: 960px;
+    }
+}
+@prefix: ui;
+@keyframes ~”@{prefix}-fade-in” {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}`&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Sass：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;$m: screen;
+$orient: landscape;
+@media #{$m} and (orientation: $orient) {
+  body {
+    width: 1000px;
+  }
+}
+$prefix: ui;
+@keyframes #{$prefix}-fade-in {
+  0% {
+      opacity: 0;
+  }
+  100% {
+      opacity: 1;
+  }
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Stylus：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;m = screen
+orient = landscape
+mq = m + &quot; and (orientation: &quot; + orient + &quot;)&quot;
+@media mq
+   body
+      width: 960px
+vendors = official
+prefix = ui;
+@keyframes {prefix}-fade-in {
+  0% {
+      opacity: 0;
+  }
+  100% {
+      opacity: 1;
+  }
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;三者均会输出如下 CSS：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;@media screen and (orientation: landscape) {
+  body {
+    width: 960px;
+  }
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;@keyframes ui-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Stylus 中似乎有 and 时由于表达式计算的逻辑不能直接像 Less 与 Sass 那样写插值，所以这里采用了字符串拼接的方式。&lt;/p&gt;
+
+&lt;p&gt;@import
+@import 对于模块化开发来说非常有帮助，但就这个功能来说，三种预处理器的行为各不相同。&lt;/p&gt;
+
+&lt;p&gt;先说 Less，Less 扩展了语法，为 @import 增加了多种选项：
+@import (less) somefile.ext 
+会将无论什么扩展名的文件都作为 Less 文件引入、一起编译；
+@import (css) somefile.ext 
+直接编译生成 @import somefile.ext，当做原生 @import；
+@import (inline) somefile.ext 
+直接将外部文件拷贝进输出文件的这个位置，但不会参与编译；
+@import (reference) somefile.ext 
+外部文件参与编译，但不输出内容，仅用来被本文件中的样式继承；
+@import (optional) somefile.ext 
+引入文件但在文件不存在时不报错，静默失败。&lt;/p&gt;
+
+&lt;p&gt;上面的选项是可以联合使用的，比如可以这样写：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;@import (less, optional) somefile.ext;&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;除此之外还有 once 和 multiple 选项分别用来表示去重和不去重的引入方式，默认为 once。在不写任何选项时，Less 会根据扩展名进行推断来决定引入逻辑。&lt;/p&gt;
+
+&lt;p&gt;Sass 没有扩展语法，而是自己推断引入的方式。.css 后缀、绝对路径、url() 表达式和带有 media query 的 @import 会直接用原生 @import，其他都会作为 Sass 代码参与编译。相比之下 Less 更灵活也更复杂。Sass 有个特有的功能叫做「partial」，因为 Sass 默认的编译工具可以编译整个目录下的文件，所以当一些文件不需要编译时，可以在文件名前加上 _ 表明这是一个被别的模块引入本身不需要编译的代码片段。Less 的 lessc 由于本来就只处理一个文件，所以这件事就交给用户自己去写编译脚本了。Sass 中有一个比较棘手的问题是，@import 不会被去重，多次引入会导致一个样式文件被多次输出到编译结果中。为了解决这个问题，Foundation 做了如下的 hack：&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;// IMPORT ONCE
+// We use this to prevent styles from being loaded multiple times for components that rely on other components.
+$modules: () !default;&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;@mixin exports($name) {
+  // Import from global scope
+  $modules: $modules !global;
+  // Check if a module is already on the list
+  $module_index: index($modules, $name);
+  @if (($module_index == null) or ($module_index == false)) {
+    $modules: append($modules, $name) !global;
+    @content;
+  }
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;然后在定义样式时都调用 exports 这个 mixin 来输出，起到只输出一次的效果。&lt;/p&gt;
+
+&lt;p&gt;Stylus 和 Sass 比较接近，也使用隐性推断的方式，但在处理重复输出的问题上，Stylus 给出了一个自定义指令 @require，用法和@import 完全一样，但只会输出一次。Stylus 还支持通配符，比如 @import ‘product/*’ 会引入 product 目录下的所有.styl 文件，但因为一般引入样式都要显式指定顺序，所以这个功能实用性不高。&lt;/p&gt;
+
+&lt;p&gt;三者相比较之下，Sass 的引入功能似乎有点残缺，不能去重是很大的硬伤。虽然能用 Foundation 那种方式「解决」，但实际上这是语言本身应该解决的问题。&lt;/p&gt;
+
+&lt;p&gt;###混入
+混入（mixin）应该说是预处理器最精髓的功能之一了。它提供了 CSS 缺失的最关键的东西：样式层面的抽象。从语法上来说，三种预处理器的差异也比较大，这甚至会直接影响到我们的开发方式。&lt;/p&gt;
+
+&lt;p&gt;Less 的混入有两种方式：
+直接在目标位置混入另一个类样式（输出已经确定，无法使用参数）； &lt;/p&gt;
+
+&lt;p&gt;定义一个不输出的样式片段（可以输入参数），在目标位置输出。（注：后面如无特殊说明，mixin 均用来指代此类混入。） 
+举例来说：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.alert {
+  font-weight: 700;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.highlight(@color: red) {
+  font-size: 1.2em;
+  color: @color;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.heads-up {
+  .alert;
+  .highlight(red);
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;最后输出：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.alert {
+  font-weight: 700;
+}
+.heads-up {
+  font-weight: 700;
+  font-size: 1.2em;
+  color: red;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;可以混入已有类样式这一点很值得商榷。在上面的例子中，.alert 样式在被混入时甚至可以是 .alert();；.highlight() 混入时也可以写成 .highlight;。那么我们遇到这样的代码时根本不知道 alert 会不会是一个 HTML class。但由于这一点是在 Less 还不支持 extend 时就有的，所以也能够理解作者可能就是将这作为 extend 来用了。所以目前比较好的实践是：用代码规范规约开发者不得使用直接混入已有类样式的方式，而是先定义 mixin 然后在输出的类样式中进行调用，调用时必须显式加上 () 来表明这不是一个 class（事实上百度 EFE 已有的 Less 编码规范就是这么定义的）。继承则应该直接通过 Less 的 :extend 来实现。&lt;/p&gt;
+
+&lt;p&gt;另外需要注意的是，Less 在进行混入时，会找到所有符合调用参数的「mixin 签名」的样式一起输出。比如：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.mixin(dark; @color) {
+  color: darken(@color, 10%);
+}
+.mixin(light; @color) {
+  color: lighten(@color, 10%);
+}
+.mixin(@_; @color) {
+  display: block;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;@switch: light;
+.class {
+  .mixin(@switch; #888);
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这个例子中，第二个和第三个 mixin 都匹配了调用时的参数，于是它们的规则都会被输出：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.class {
+  color: #a2a2a2;
+  display: block;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;也就是说同名的 mixin 不是后面覆盖前面，而是会累加输出。只要参数符合定义，就会将 mixin 内部的样式规则、甚至变量全部拷贝到目标作用域下。&lt;/p&gt;
+
+&lt;p&gt;这一点同样会带来一个问题：如果存在和 mixin 同名的 class 样式，如果 mixin 没有参数则在调用时会把对应的 class 样式一起输出，这显然是不符合预期的。&lt;/p&gt;
+
+&lt;p&gt;假设有个叫 .clearfix 的 mixin，有两个 class 样式调用了它（其中一个也叫 clearfix）：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.clearfix() {
+    *zoom: 1;
+    &amp;amp;:before,&amp;amp;:after {
+        display: table;
+        content: &quot;&quot;;
+    }
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.clearfix {
+  .clearfix();
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.list {
+  .clearfix();
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;得到的输出是：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.clearfix {
+    *zoom: 1;
+}
+.clearfix:before,
+.clearfix:after {
+    display: table;
+    content: &quot;&quot;;
+}
+.clearfix:after {
+    clear: both;
+}
+.list {
+    *zoom: 1;
+}
+.list:before,
+.list:after {
+    display: table;
+    content: &quot;&quot;;
+}
+.list:after {
+    clear: both;
+}
+.list:before,
+.list:after {
+    display: table;
+    content: &quot;&quot;;
+}
+.list:after {
+    clear: both;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;.list 的样式调用了两次！这一点在开发中一定要注意，不要给和非输出型 mixin 同名的类定义样式。&lt;/p&gt;
+
+&lt;p&gt;对于 Sass，语义非常明确：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;@mixin large-text {
+    font: {
+        family: Arial;
+        size: 20px;
+        weight: bold;
+    }
+    color: #ff0000;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.page-title {
+    @include large-text;
+    padding: 4px;
+    margin-top: 10px;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Sass 用 @mixin 和 @include 两个指令清楚地描述了语义，不存在混入类样式的情况，但是书写时略显繁琐一些。当然，用 Sass 语法 而非 SCSS 语法的话可以简单地用 = 定义 mixin，用 + 引入 mixin：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;=large-text
+ font:
+    family: Arial
+    size: 20px
+    weight: bold
+ color: #ff0000&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.page-title
+    +large-text
+ padding: 4px
+ margin-top: 10px&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;和 Less 不同，同名的 mixin 可以覆盖之前的定义，作用机制类似变量。
+Stylus 和 Sass 类似，但不用什么特殊的标记来引入：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;border-radius(n)
+    -webkit-border-radius: n
+    -moz-border-radius: n
+border-radius: n&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.circle
+    border-radius(50%)&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Stylus 中还有一个「透明 mixin」的功能，也就是说引入 mixin 完全可以和引入普通属性一样！例如上面的这个 mixin，也可以这样引入：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.circle
+    border-radius: 50%&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这意味着可以把兼容性上的处理隐藏在 mixin 中，直接用标准属性同名的 mixin 按普通属性的方式输出。当不需要兼容老浏览器时，直接把 mixin 定义删除仍然能够正常输出。不过这种写法虽然感觉非常「爽快」，但要求开发者必须能很好地区分原生属性和某个样式库中提供的 mixin 功能（对于有经验的开发者问题不大），而且透明意味着看到一个普通属性开发者不能判断是否已经在某处用 mixin 进行了重写，无法明确知道这里的代码最后输出会不会发生变化。在可控条件下，这个功能应该说是非常诱人的。&lt;/p&gt;
+
+&lt;p&gt;将声明块作为混入参数&lt;/p&gt;
+
+&lt;p&gt;如果说调用时想传入一组样式声明而非单个值，三种预处理器都提供了相应的功能，但实现方式各有不同。&lt;/p&gt;
+
+&lt;p&gt;在 Less 中需要先定义一个「规则集变量」（detached ruleset，其实就是 CSS 声明块，即规则集去掉选择器的部分），然后在调用 mixin 时把它作为参数传进去，然后在 mixin 中用 @var() 的方式输出：&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.red(@custom) {
+    color: red;
+    @custom();
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.alert {
+    @styles: {
+        font-weight: 700;
+        font-size: 1.5em;
+   }
+  .red(@styles);
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;在 Sass 和 Stylus 中，都支持直接在 mixin 调用下层传入声明块：&lt;/p&gt;
+
+&lt;p&gt;Sass 下直接跟一个声明块即可，然后用关键字 @content 来进行输出：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;@mixin red() {
+    color: red;
+    @content;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.alert {
+    @include red() {
+        font-weight: 700;
+        font-size: 1.5em;
+   }
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Stylus 支持两种方法，首先是 Less 那样的「具名」声明块，调用时当做变量：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;red(foo)
+    color: red
+    {foo}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.alert
+    foo =
+        font-weight: 700
+        font-size: 1.5em
+    red(foo)&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;第二种是 Sass 那样类似传入「字面量」，并且用关键词 block 输出的方式。这种方式需要为要传入声明块的 mixin 前添加一个 +符号（可能是来自 SCSS 的对应功能）：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;red()
+    color: red
+    {block}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.alert
+    +red()
+    font-weight: 700
+    font-size: 1.5em&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;第二种方式可以看做是第一种方式的语法糖，在 mixin 只需要传入一个声明块时可以免去起名字带来的困扰。&lt;/p&gt;
+
+&lt;p&gt;相比之下 Less 只支持先定义变量后传入的方式，优点是可以传入多个声明块；而 Sass 只支持传入一个「匿名」声明块但是更简单；Stylus 则是两种方式都支持。这个功能在抽象「需要应用样式的条件」时非常有用，比如我们基于 Stylus 的样式库 rider 中就用它来实现对 media query 的抽象封装。&lt;/p&gt;
+
+&lt;p&gt;###继承
+混入很好用，可也有问题：如果多个地方都混入同样的代码，会造成输出代码的多次重复。比如在 Stylus 下：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;message()
+    padding: 10px
+    border: 1px solid #eee&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.message
+    message()&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.warning
+    message()
+    color: #e2e21e&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;会输出：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.message {
+    padding: 10px;
+    border: 1px solid #eee;
+}
+.warning {
+    padding: 10px;
+    border: 1px solid #eee;
+    color: #e2e21e;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;而我们可能期望的输出是：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.message,
+.warning {
+    padding: 10px;
+    border: 1px solid #eee;
+}
+.warning {
+    color: #e2e21e;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;也许大家会说可以这么写：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;message()
+     padding: 10px
+     border: 1px solid #eee&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.message,.warning
+     message()&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.warning
+     color: #e2e21e&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这样就可以按需要输出了。但其实预处理器的一个好处就是可以方便我们进行模块化开发。上面的例子中，.message 和 .warning的样式如果是分布在两个模块中的，我合并过的选择器组样式写在哪里呢？情况更复杂的时候就更棘手了。&lt;/p&gt;
+
+&lt;p&gt;这个时候就该继承出场了：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.message
+    padding: 10px
+    border: 1px solid #eee&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.warning
+    @extend .message
+    color: #e2e21e&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这样就可以按模块进行开发（不管是分文件还是在同一文件中按业务功能安排样式的顺序），同时兼顾输出的效率了。&lt;/p&gt;
+
+&lt;p&gt;Stylus 的继承方式来自 Sass，两者如出一辙。 而 Less 则又「独树一帜」地用伪类来描述继承关系：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.message {
+    padding: 10px;
+    border: 1px solid #eee;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.warning {
+    &amp;amp;:extend(.message);
+    color: #e2e21e;
+}
+/* Or:
+.warning:extend(.message) {
+    color: #e2e21e;
+}
+*/&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;同时，Less 默认只继承父类本身的样式，如果要同时继承嵌套定义在父类作用域下的样式，得使用关键字 all，比如&amp;amp;:extend(.message all);。&lt;/p&gt;
+
+&lt;p&gt;关于使用伪类描述继承关系，Hax 在 Less 的另一个 issue 下曾经言辞激烈地提出了批评，同时也遭到了 Less 项目组毫不客气的回应。我个人完全赞同 Hax 的看法，因为选择器是用来在树结构中找到元素的，和样式本身完全无关。但 Less 社区在当时却对这个语法表示了一致的赞同，不禁让人对其感到担忧。&lt;/p&gt;
+
+&lt;p&gt;不管语法如何，继承功能还有一个潜在的问题：继承会影响输出的顺序。假设有如下的 Sass 代码：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.active {
+    color: red;
+}
+button.primary {
+    color: green;
+}
+button.active {
+    @extend .active;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;而对应的 HTML 代码是：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;button class=&quot;primary active&quot;&amp;gt;Submit&amp;lt;/button&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;很容易误以为效果是红色的。而其实生成的 CSS 顺序如下：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.active, button.active {
+    color: red;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;button.primary {
+    color: green;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;由于合并选择器的关系 .active 被移到了 .primary 之前，所以依赖顺序而非选择器 specificity 时可能会遇到陷阱。
+###placeholder
+Placeholder 是什么？简单来说就是一个声明块（预处理器 DSL 中的声明块，包含其下嵌套规则），但是不会在最终的 CSS 中输出。其实这是一组「抽象」样式，只存在于预处理器的编译过程中（类似 mixin），但不同之处是它可以被继承。这样我们就可以在纯样式层为声明块起与样式强耦合的名称而不怕它出现在 CSS 与 HTML 的「接口」——选择器之中了。&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Sass：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;%red-card {
+    border: 1px solid #300;
+    background-color: #ecc;
+    color: #c00;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.alert {
+    @extend %red-card;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Stylus：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;$red-card
+    border: 1px solid #300
+    background-color: #ecc
+    color: #c00&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.alert
+    @extend $red-card&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;均输出：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.alert {
+    border: 1px solid #300;
+    background-color: #ecc;
+    color: #c00;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Less 目前不支持这个功能，但开发组目前的共识是可能会用继承 mixin 的方式来实现，比如上面的这个例子未来可能可以通过如下方法实现：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.red-card() {
+    border: 1px solid #300;
+    background-color: #ecc;
+    color: #c00;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.alert {
+    &amp;amp;:extend(.red-card());
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;当前在 Less 下也有一个 hack 来模拟 placeholder 功能，原理是利用 @import (reference) 来实现「placeholder」不输出的功能：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;// placeholder.less
+.red-card {
+    border: 1px solid #300;
+    background-color: #ecc;
+    color: #c00;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;// style.less
+@import (reference) &quot;placeholder.less&quot;;
+.alert {
+    &amp;amp;:extend(.red-card);
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;不过 @import (reference) 在复杂一些的情况下（被引入的文件有 @import、有 :extend 等）可能会遇到一些 bug，比如：#1851、#1878、#1896。目前以 reference 方式引入 Bootstrap 时就会直接产生代码输出。&lt;/p&gt;
+
+&lt;p&gt;###函数
+先说说原生函数。三种预处理器都自带了诸如色彩处理、类型判断、数值计算等内置函数，目前版本的数量都在 80 个左右。由于 Sass 和 Stylus 都内置脚本语言，所以自带函数中包括了很多处理不同数据类型、修改选择器的函数。Sass 更是提供了不少特性检测函数比如
+feature-exits(feature)、variable-exists(feature)、variable-exists(name) 等，这为第三方库的兼容性提供了很好的保障。因为有了这些函数可以方便地对不同版本的 Sass 编译器有针对性地提供兼容，而不怕在老版本的编译环境中直接报错。&lt;/p&gt;
+
+&lt;p&gt;三者调用函数的方式几乎一致，不同之处在于 Sass 和 Stylus 支持直接指定参数名的方式传入参数。以 Stylus 为例：&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;subtract(a, b)
+    a - b&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;subtract(b: 10, a: 25) // same as substract(25, 10)&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这样做的好处是，如果参数列表比较长，Stylus 可以直接为列表后面的参数赋值，而不需要一路将之前的参数填上 null 或默认值。Stylus 将这个特性称为「Named parameters」，而 Sass 称为「Keyword arguments」。&lt;/p&gt;
+
+&lt;p&gt;关于函数，真正的区别在于：Sass 和 Stylus 都支持用 DSL 直接添加自定义函数，而 Less 中如果要添加自定义函数必须通过使用插件（2.0.0 以后的版本才支持插件）。这决定了用 Sass 和 Stylus 书写的代码可移植性更高，不需要编译环境有插件即可运行，而 Less 则需要额外添加编译时的依赖。&lt;/p&gt;
+
+&lt;p&gt;Sass 中自定义函数需要使用 @function 指令，并用 @return 指令返回结果：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;@function golden-ratio($n) {
+    @return $n * 0.618;
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.golden-box {
+    width: 200px;
+    height: golden-ratio(200px);
+}&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;在 Stylus 中，这些都是隐含的，最后一个表达式的值会作为返回值：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;golden-ratio(n)
+    n * 0.618&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.golden-box
+    width: 200px
+    height: golden-ratio(@width)&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这种写法和 mixin 有什么区别？当把函数作为 mixin 调用时，如果其中有 prop: value 这样格式的内容，就会被当做样式规则输出。Stylus 中大量的内容都是根据调用时的 context 去隐式推断该使用什么逻辑进行输出，而非 Less 和 Sass 那样使用关键字去显式地进行区分。&lt;/p&gt;
+
+&lt;p&gt;以下内容超出了微信字数限制，遂用图片代替，体验估计不怎么好，建议点击图片放大查看
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-c012f7d230dbc1f5?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name></name></author><summary type="html">再谈CSS 预处理器 2016-09-09 Justineo JavaScript 转自：http://efe.baidu.com/blog/revisiting-css-preprocessors/</summary></entry><entry><title type="html">将[object Object]转换成json对象</title><link href="http://localhost:4000/2016/12/14/%E5%B0%86-object-Object-%E8%BD%AC%E6%8D%A2%E6%88%90json%E5%AF%B9%E8%B1%A1.html" rel="alternate" type="text/html" title="将[object Object]转换成json对象" /><published>2016-12-14T00:00:00+08:00</published><updated>2016-12-14T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/14/%E5%B0%86%5Bobject-Object%5D%E8%BD%AC%E6%8D%A2%E6%88%90json%E5%AF%B9%E8%B1%A1</id><content type="html" xml:base="http://localhost:4000/2016/12/14/%E5%B0%86-object-Object-%E8%BD%AC%E6%8D%A2%E6%88%90json%E5%AF%B9%E8%B1%A1.html">&lt;p&gt;这两天在做中英文双版的文件，页面根据语言读取不同的内容。js模板用的是ejs&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;json文件： 
+`
+“components”:{
+  “pages”:{
+    “home”:{
+        “meta”:{
+          “title”:”首页”,
+          “keywords”:”关键字”,
+          “desc”:”描述”
+        },
+       “title”:”登录失败”,
+       “button”:”重新登录”
+    }
+  }
+}&lt;code class=&quot;highlighter-rouge&quot;&gt;
+页面js代码
+&lt;/code&gt;let metaTitle = “&amp;lt;%= components.pages.home.meta.title %&amp;gt;”
+console.log(metaTitle)
+//控制台输出：首页 `
+但是当json文件中数据很多，而又都需要的情况下，显然不能一条一条赋值，最好是可以将整个对象进行赋值，比如：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;let home =&quot;&amp;lt;%= components.pages.home %&amp;gt;&quot;
+console.log(home)
+//控制台输出：[object Object]&lt;/code&gt;
+这种情况下，控制台输出的是[object Object]，看不到具体的内容，于是需要将它转换成与json文件中格式一致，方便在js中使用&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;li&gt;JSONObject.fromObject()
+`
+let home = “&amp;lt;%= components.pages.home %&amp;gt;”
+let homeObj = JSONObject.fromObject(home);
+console.log(homeObj)
+//ReferenceError: JSONObject is not defined[详细了解]
+`&lt;/li&gt;
+    &lt;li&gt;JSON.stringify()
+`
+let home = “&amp;lt;%= components.pages.home %&amp;gt;”
+let homeObj = JSON.stringify(home);
+console.log(homeObj)
+//”[object Object]”
+`&lt;/li&gt;
+    &lt;li&gt;JSON.parse()
+`
+let home = “&amp;lt;%= components.pages.home %&amp;gt;”
+let homeObj = JSON.parse(home);
+console.log(homeObj)
+//SyntaxError: JSON.parse: unexpected character at line 1 column 2 of the JSON data[详细了解]
+`&lt;/li&gt;
+    &lt;li&gt;ps:let home = “&amp;lt;%= components.pages.home %&amp;gt;” 这里的双引号在解析的时候，会和内部的双引号行程匹配，所以下一种办法中，将”“改成了’’&lt;/li&gt;
+    &lt;li&gt;最后提供一种目前自己代码使用的办法
+ `
+let home = JSON.parse(decodeURI(‘&amp;lt;%- encodeURI(JSON.stringify(components.pages.home)) %&amp;gt;’))
+`
+后来发现并不需要decode和encode
+`
+let home = JSON.parse(‘&amp;lt;%- JSON.stringify(components.pages.home) %&amp;gt;’)
+`&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/blockquote&gt;</content><author><name></name></author><summary type="html">这两天在做中英文双版的文件，页面根据语言读取不同的内容。js模板用的是ejs json文件： ` “components”:{ “pages”:{ “home”:{ “meta”:{ “title”:”首页”, “keywords”:”关键字”, “desc”:”描述” }, “title”:”登录失败”, “button”:”重新登录” } } } 页面js代码 let metaTitle = “&amp;lt;%= components.pages.home.meta.title %&amp;gt;” console.log(metaTitle) //控制台输出：首页 ` 但是当json文件中数据很多，而又都需要的情况下，显然不能一条一条赋值，最好是可以将整个对象进行赋值，比如： let home =&quot;&amp;lt;%= components.pages.home %&amp;gt;&quot; console.log(home) //控制台输出：[object Object] 这种情况下，控制台输出的是[object Object]，看不到具体的内容，于是需要将它转换成与json文件中格式一致，方便在js中使用 JSONObject.fromObject() ` let home = “&amp;lt;%= components.pages.home %&amp;gt;” let homeObj = JSONObject.fromObject(home); console.log(homeObj) //ReferenceError: JSONObject is not defined[详细了解] ` JSON.stringify() ` let home = “&amp;lt;%= components.pages.home %&amp;gt;” let homeObj = JSON.stringify(home); console.log(homeObj) //”[object Object]” ` JSON.parse() ` let home = “&amp;lt;%= components.pages.home %&amp;gt;” let homeObj = JSON.parse(home); console.log(homeObj) //SyntaxError: JSON.parse: unexpected character at line 1 column 2 of the JSON data[详细了解] ` ps:let home = “&amp;lt;%= components.pages.home %&amp;gt;” 这里的双引号在解析的时候，会和内部的双引号行程匹配，所以下一种办法中，将”“改成了’’ 最后提供一种目前自己代码使用的办法 ` let home = JSON.parse(decodeURI(‘&amp;lt;%- encodeURI(JSON.stringify(components.pages.home)) %&amp;gt;’)) ` 后来发现并不需要decode和encode ` let home = JSON.parse(‘&amp;lt;%- JSON.stringify(components.pages.home) %&amp;gt;’) `</summary></entry><entry><title type="html">移动端虚拟键盘和fixed的坑</title><link href="http://localhost:4000/2016/12/09/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E8%99%9A%E6%8B%9F%E9%94%AE%E7%9B%98%E5%92%8Cfixed%E7%9A%84%E5%9D%91.html" rel="alternate" type="text/html" title="移动端虚拟键盘和fixed的坑" /><published>2016-12-09T00:00:00+08:00</published><updated>2016-12-09T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/09/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E8%99%9A%E6%8B%9F%E9%94%AE%E7%9B%98%E5%92%8Cfixed%E7%9A%84%E5%9D%91</id><content type="html" xml:base="http://localhost:4000/2016/12/09/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E8%99%9A%E6%8B%9F%E9%94%AE%E7%9B%98%E5%92%8Cfixed%E7%9A%84%E5%9D%91.html">&lt;p&gt;这两天接手一个新需求，做一个直播间的页面，用于微信平台。&lt;/p&gt;
+&lt;h1 id=&quot;需求&quot;&gt;需求&lt;/h1&gt;
+&lt;p&gt;页面的设计稿要求 头部和底部置顶，底部有输入框，中间部分为显示内容的区域，可滚动&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;`  &amp;lt;section class=&quot;header award-frame&quot;&amp;gt;&amp;lt;/section&amp;gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;section class=&quot;main&quot;&gt;&lt;/section&gt;
+&lt;section class=&quot;footer input-area&quot;&gt;&lt;/section&gt;
+&lt;p&gt;`&lt;/p&gt;
+
+&lt;h1 id=&quot;问题&quot;&gt;问题&lt;/h1&gt;
+
+&lt;blockquote&gt;
+  &lt;ul&gt;
+    &lt;li&gt;虚拟键盘弹起时，fixed样式失效&lt;/li&gt;
+    &lt;li&gt;无法监听虚拟键盘弹起、关闭状态&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;解决方案&quot;&gt;解决方案&lt;/h1&gt;
+&lt;h3 id=&quot;1用absolute和relative代替fixed&quot;&gt;1.用absolute和relative代替fixed&lt;/h3&gt;
+&lt;p&gt;1.在键盘弹起的时候，将头部定位成relative，底部定位为absolute，但是此时底部的bottom:0是相对屏幕高度来说的，也就是说当屏幕滑动时，底部也会滚动&lt;/p&gt;
+&lt;h3 id=&quot;2使用iscrolljs&quot;&gt;2.使用iscroll.js&lt;/h3&gt;
+&lt;p&gt;JS代码
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-dc626e6529fffd81.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;iscroll-js.png&quot; /&gt;
+页面代码结构
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-862e042c5317a683.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;iscroll.png&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;3微信设置&quot;&gt;3.微信设置&lt;/h3&gt;
+&lt;p&gt;这是向同事请教的一个办法，微信可以设置虚拟键盘弹起的时候，不改变页面的样式，但是此种方案只适用于微信， &lt;a href=&quot;http://jingyan.baidu.com/article/e5c39bf5a044e839d7603332.html&quot; title=&quot;百度相关链接&quot;&gt;百度相关链接&lt;/a&gt; 
+将我们的域名添加进去，在微信端打开的时候就不会再重新布局了，不知道这个解决办法是否可行，因为第二天打开的时候，发现并没有出现所预期的效果，还是被重新布局了&lt;/p&gt;
+
+&lt;p&gt;###4.监听虚拟键盘
+虚拟键盘的弹起和关闭状态，可以用resize()来进行监听，当然，屏幕旋转的时候也会触发这个方法，此时就需要自己做判断控制。&lt;/p&gt;</content><author><name></name></author><summary type="html">这两天接手一个新需求，做一个直播间的页面，用于微信平台。 需求 页面的设计稿要求 头部和底部置顶，底部有输入框，中间部分为显示内容的区域，可滚动 ` &amp;lt;section class=&quot;header award-frame&quot;&amp;gt;&amp;lt;/section&amp;gt; `</summary></entry><entry><title type="html">移动端点击阴影去掉、新增点击(pressed)样式</title><link href="http://localhost:4000/2016/12/09/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E7%82%B9%E5%87%BB%E9%98%B4%E5%BD%B1%E5%8E%BB%E6%8E%89-%E6%96%B0%E5%A2%9E%E7%82%B9%E5%87%BB(pressed)%E6%A0%B7%E5%BC%8F.html" rel="alternate" type="text/html" title="移动端点击阴影去掉、新增点击(pressed)样式" /><published>2016-12-09T00:00:00+08:00</published><updated>2016-12-09T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/09/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E7%82%B9%E5%87%BB%E9%98%B4%E5%BD%B1%E5%8E%BB%E6%8E%89%E3%80%81%E6%96%B0%E5%A2%9E%E7%82%B9%E5%87%BB(pressed)%E6%A0%B7%E5%BC%8F</id><content type="html" xml:base="http://localhost:4000/2016/12/09/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E7%82%B9%E5%87%BB%E9%98%B4%E5%BD%B1%E5%8E%BB%E6%8E%89-%E6%96%B0%E5%A2%9E%E7%82%B9%E5%87%BB(pressed)%E6%A0%B7%E5%BC%8F.html">&lt;p&gt;移动端一些按钮、图片在点击的时候，背景会自带阴影，这个时候想要给他去掉，就需要在点击的内容上加上 -webkit-tap-highlight-color：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;/*关键代码*/
+  -webkit-tap-highlight-color: transparent;&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;图片按钮，点击（pressed）状态下更换图片，或者是其他样式，都一样的处理办法&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+.input-area .send-area .gift.close:active{   
+ -webkit-transition-duration: 0s;    
+-moz-transition-duration: 0s;    
+transition-duration: 0ms;    
+background-image: url(./imgs/2X/gift_close_2x_pressed.png);    
+background-image: -webkit-image-set(url(./imgs/2X/gift_close_2x_pressed.png) 1x,url(./imgs/2X/gift_close_2x_pressed.png) 2x,url(./imgs/3X/gift_close_3x_pressed.png) 3x);}
+&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;移动端active状态下会有延迟，需要长按才会显示，这个时候，可以在js中加入&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;document.body.addEventListener(‘touchstart’, function () { });&lt;/p&gt;
+&lt;/blockquote&gt;</content><author><name></name></author><summary type="html">移动端一些按钮、图片在点击的时候，背景会自带阴影，这个时候想要给他去掉，就需要在点击的内容上加上 -webkit-tap-highlight-color： /*关键代码*/ -webkit-tap-highlight-color: transparent;</summary></entry><entry><title type="html">锋利的jquery 记录的部分笔记</title><link href="http://localhost:4000/2016/11/08/%E9%94%8B%E5%88%A9%E7%9A%84jQuery-%E8%AE%B0%E5%BD%95%E7%9A%84%E9%83%A8%E5%88%86%E7%AC%94%E8%AE%B0.html" rel="alternate" type="text/html" title="锋利的jquery 记录的部分笔记" /><published>2016-11-08T00:00:00+08:00</published><updated>2016-11-08T00:00:00+08:00</updated><id>http://localhost:4000/2016/11/08/%E9%94%8B%E5%88%A9%E7%9A%84jQuery-%E8%AE%B0%E5%BD%95%E7%9A%84%E9%83%A8%E5%88%86%E7%AC%94%E8%AE%B0</id><content type="html" xml:base="http://localhost:4000/2016/11/08/%E9%94%8B%E5%88%A9%E7%9A%84jQuery-%E8%AE%B0%E5%BD%95%E7%9A%84%E9%83%A8%E5%88%86%E7%AC%94%E8%AE%B0.html">&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt; &lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;Window.onload&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;$(document).ready()&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;执行时机&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;必须等待网页中所有的内容（包括图片）加载完毕后才能执行&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;网页中所有DOM结构绘制完毕就执行，可能DOM元素关联的东西并没有加载完&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;编写个数&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;不能同时编写多个，&lt;br /&gt;以下代码无法正确执行：&lt;br /&gt;Window.onload =function(){&lt;br /&gt; alert(‘test1’);&lt;br /&gt;} &lt;br /&gt;Window.onload =function(){&lt;br /&gt; alert(‘test2’);&lt;br /&gt;}&lt;br /&gt;结果只会输出”test2”&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;能同时编写多个，&lt;br /&gt;以下代码正确执行：&lt;br /&gt;$(document).ready(){&lt;br /&gt; alert(‘hello world’);&lt;br /&gt;} &lt;br /&gt;$(document).ready(){&lt;br /&gt; alert(‘hello again’);&lt;br /&gt;} &lt;br /&gt;结果两次都输出&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;简化写法&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;无&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;$(document).ready(){}&lt;br /&gt;可以简化写成&lt;br /&gt;$(function(){})&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;###jquery链式操作代码块风格
+子元素的操作推荐缩进&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;$(this).addClass(‘highlight’)
+ .children(‘li’).show().end()
+.siblings().removeClass(‘highlight’)
+ .children(‘li’).hide()&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;###事件冒泡(阻止事件冒泡和自身的默认行为)&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+$(element).bing('click', function(){
+    //点击事件的处理
+    event.stopPropagation(); //停止事件冒泡
+})&lt;/code&gt;
+ 页面某些元素有默认行为，比如submit的表单提交
+&lt;code class=&quot;highlighter-rouge&quot;&gt;event.preventDefault();//可以阻止元素的默认行为&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;###只能使用一次的点击事件，用one绑定&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;$(element).one(‘click’, function(){})&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;###序列化元素&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;ul&gt;
+    &lt;li&gt;serialize()
+当表单中的内容比较多时，一个一个获取Input的内容显然是不合适的，此时就可以用到serialize()，例如
+$(‘#form’).serialize()
+$(“:checked,:radio”).serialize()只会将选中的值序列化
+$(‘#form’).serializeArray()不是返回字符串了，而是返回json&lt;/li&gt;
+    &lt;li&gt;$.param()方法
+var obj = {a:1,b:2,c:3}
+var k = $.param(obj)
+此时k输出为a=1&amp;amp;b=2&amp;amp;c=3&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;ul&gt;
+    &lt;li&gt;$(element).ajaxStart({})//ajax开始之前，比如在页面部分地方显示加载中。。。&lt;/li&gt;
+    &lt;li&gt;$(element).ajaxStop({})&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;###JQuery validator&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;//自定义一个验证方法
+$.validator.addMethod(
+    &quot;functionName&quot;,
+    function(value,element,param){
+        return value == eval(param)
+    },
+    '错误提示信息'
+)
+&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;###闭包
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-efc319091e0ec3ad.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;闭包1.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-cde631971f53c1c2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;闭包2.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;###常见的JQuery插件写法&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt; 
+;(function($){
+      /*这里放置代码*/
+ })(jQuery);&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1874069-73d49e8583a9123d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;JQuery.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;###jQuery判断浏览器类型&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$(document).ready(){
+    //Firefox 2 and above
+    if ( $.browser.mozilla &amp;amp;&amp;amp; $.browser.version &amp;gt;= &quot;1.8&quot; ) {
+        //do something
+    }
+    //Safari
+    if ( $.browser.safari ) {
+        //do something
+    }
+    //Chrome
+    if ( $.browser.chrome ) {
+        //do something
+    }
+    //Opera
+    if ( $.browser.opera ) {
+        //do something
+    }
+    //IE6 and below
+    if ( $.browser.mise &amp;amp;&amp;amp;  $.browser.version &amp;lt;= &quot;6&quot; ) {
+        //do something
+    }
+    //anything above IE6
+    if ( $.browser.mise &amp;amp;&amp;amp;  $.browser.version &amp;gt; 6 ) {
+        //do something
+    }
+}
+&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;</content><author><name></name></author><summary type="html">  Window.onload $(document).ready() 执行时机 必须等待网页中所有的内容（包括图片）加载完毕后才能执行 网页中所有DOM结构绘制完毕就执行，可能DOM元素关联的东西并没有加载完 编写个数 不能同时编写多个，以下代码无法正确执行：Window.onload =function(){ alert(‘test1’);} Window.onload =function(){ alert(‘test2’);}结果只会输出”test2” 能同时编写多个，以下代码正确执行：$(document).ready(){ alert(‘hello world’);} $(document).ready(){ alert(‘hello again’);} 结果两次都输出 简化写法 无 $(document).ready(){}可以简化写成$(function(){})</summary></entry></feed>

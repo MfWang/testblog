@@ -1,0 +1,35 @@
+<h1 id="区别">区别：</h1>
+<ul>
+  <li>对于依赖的模块，AMD 是<strong>提前执行</strong>，CMD 是<strong>延迟执行</strong>。不过 RequireJS 从 2.0 开始，也改成可以延迟执行（根据写法不同，处理方式不同）。CMD 推崇 as lazy as possible.
+    <ol>
+      <li>CMD 推崇<strong>依赖就近</strong>，AMD 推崇<strong>依赖前置</strong>。看代码：
+// CMD
+        <blockquote>
+          <p><code class="highlighter-rouge">
+define(function(require, exports, module) {var a = require('./a')a.doSomething()// 此处略去 100 行var b = require('./b') // 依赖可以就近书写b.doSomething()// ...})</code></p>
+        </blockquote>
+      </li>
+    </ol>
+  </li>
+</ul>
+
+<p>// AMD 默认推荐的是</p>
+<blockquote>
+  <p><code class="highlighter-rouge">
+define(['./a', './b'], function(a, b) { // 依赖必须一开始就写好
+a.doSomething()// 此处略去 100 行
+b.doSomething()
+...
+})</code></p>
+</blockquote>
+
+<p>虽然 AMD 也支持 CMD 的写法，同时还支持将 require 作为依赖项传递，但 RequireJS 的作者默认是最喜欢上面的写法，也是官方文档里默认的模块定义写法。</p>
+
+<ul>
+  <li>
+    <p>AMD 的 API 默认是<strong>一个当多个用</strong>，CMD 的 API 严格区分，推崇<strong>职责单一</strong>。比如 AMD 里，require 分全局 require 和局部 require，都叫 require。CMD 里，没有全局 require，而是根据模块系统的完备性，提供 seajs.use 来实现模块系统的加载启动。CMD 里，每个 API 都<strong>简单纯粹</strong>。</p>
+  </li>
+  <li>
+    <p>还有一些细节差异，具体看这个规范的定义就好，就不多说了。</p>
+  </li>
+</ul>

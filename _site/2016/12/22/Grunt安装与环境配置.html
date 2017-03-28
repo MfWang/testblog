@@ -1,0 +1,144 @@
+<p><code class="highlighter-rouge">Grunt 依赖 Node.js 所以在安装之前确保你安装了 Node.js。然后开始安装 Grunt</code>
+<code class="highlighter-rouge">实际上，安装的并不是 Grunt，而是 Grunt-cli，也就是命令行的 Grunt，这样你就可以使用 grunt 命令来执行某个项目中的 Gruntfile.js 中定义的 task 。但是要注意，Grunt-cli 只是一个命令行工具，用来执行，而不是 Grunt 这个工具本身</code></p>
+<blockquote>
+  <p>项目的github地址：<a href="https://github.com/AveSore/grunt_test">grunt_test</a></p>
+</blockquote>
+
+<ul>
+  <li>
+    <p>####1.安装node
+<a href="http://www.runoob.com/nodejs/nodejs-install-setup.html">node.js安装教程</a></p>
+  </li>
+  <li>####2.grunt命令行（CLI） 安装在全局环境下，所以命令是这么写滴！
+    <blockquote>
+      <p>npm install -g grunt-cli</p>
+    </blockquote>
+  </li>
+  <li>
+    <p>####3.新建一个项目，名字叫grunt_test：注意，千万不要叫grunt，后面运行grunt命令的时候会出错
+下面是我的项目目录
+<img src="http://upload-images.jianshu.io/upload_images/1874069-b689a858fbbbbe51.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="QQ截图20161222155458.png" /></p>
+  </li>
+  <li>####4.生成package.json，也可以手动生成这样一个文件
+    <blockquote>
+      <p>npm init</p>
+    </blockquote>
+  </li>
+</ul>
+
+<p>生成之后在里面填入以下内容
+<img src="http://upload-images.jianshu.io/upload_images/1874069-205e8540ce72003f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="package.json.png" /></p>
+
+<ul>
+  <li>####5.安装grunt
+    <blockquote>
+      <p>nam install grunt –save-dev  注意查看package.json文件</p>
+    </blockquote>
+  </li>
+</ul>
+
+<p><img src="http://upload-images.jianshu.io/upload_images/1874069-72c7021806151060.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="grunt安装成功.png" />
+偶？自动把grunt的版本号加上啦。对啦，这就是–save-dev的作用</p>
+
+<ul>
+  <li>####6.安装grunt插件</li>
+</ul>
+
+<blockquote>
+  <p>js语法检查:<a href="https://github.com/gruntjs/grunt-contrib-jshint">grunt-contrib-jshint</a>     <br />
+安装命令：npm install grunt-contrib-jshint –save-dev 下同
+css语法检查：<a href="https://github.com/gruntjs/grunt-contrib-csslint">grunt-contrib-csslint</a>
+合并文件：<a href="https://github.com/gruntjs/grunt-contrib-concat">grunt-contrib-concat</a>
+js压缩文件：<a href="https://github.com/gruntjs/grunt-contrib-uglify">grunt-contrib-uglify</a>
+css压缩文件：<a href="https://github.com/gruntjs/grunt-contrib-cssmin">grunt-contrib-cssmin</a>
+image压缩文件：<a href="https://github.com/gruntjs/grunt-contrib-imagemin">grunt-contrib-imagemin</a>
+html压缩文件：<a href="https://github.com/gruntjs/grunt-contrib-htmlmin">grunt-contrib-htmlmin</a>
+Sass\Scss 编译：<a href="https://github.com/gruntjs/grunt-contrib-sass">grunt-contrib-sass</a> 
+安装sass插件后，我运行grunt，发现报错，提示ruby没有安装，所以如果需要使用到这个插件的，要确保自己的电脑上是否有装ruby，没有的话要进行安装
+<code class="highlighter-rouge">sudo yum install ruby</code> # CentOS, Fedora, 或 RHEL 系统
+<code class="highlighter-rouge">sudo apt-get install ruby-full</code> # Debian 或 Ubuntu 系统
+<code class="highlighter-rouge">brew install ruby</code> #苹果系统
+Less 编译：<a href="https://github.com/gruntjs/grunt-contrib-less">grunt-contrib-less</a>
+ 监听文件变动：<a href="https://github.com/gruntjs/grunt-contrib-watch">grunt-contrib-watch</a>
+建立本地服务器：<a href="https://github.com/gruntjs/grunt-contrib-connect">grunt-contrib-connect</a></p>
+</blockquote>
+
+<p>上面这些插件都安装好后，注意看package.json文件中的内容
+<img src="http://upload-images.jianshu.io/upload_images/1874069-f383e920c8ff6bfb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="grunt插件安装成功.png" /></p>
+
+<ul>
+  <li>####7.配置Gruntfile.js</li>
+</ul>
+
+<p>这里是对每个需要的插件进行配置
+<img src="http://upload-images.jianshu.io/upload_images/1874069-0a78bb72b0321f7b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="grunt.initConfig.png" /></p>
+
+<p>插件太多了，挑其中一个(uglify，用于js压缩)进行详细说明
+<img src="http://upload-images.jianshu.io/upload_images/1874069-7e522aab42aa9560.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="grunt-contrib-uglify.png" /></p>
+
+<p>grunt是任务机制，我在这里给定了combine、compress、fileCompress三个任务，执行grunt时会按顺序执行三个任务</p>
+<blockquote>
+
+  <div class="highlighter-rouge"><pre class="highlight"><code>uglify:{    
+    options:{        
+        sourceMap: false,        
+        stripBanners: true,        
+        //压缩后的文件注释信息        
+        banner :'/*! &lt;%=pkg.name%&gt;-&lt;%=pkg.version%&gt;.js &lt;%= grunt.template.today("yyyy-mm-dd") %&gt; */\n',        
+        footer:'\n/*!修改于&lt;%= grunt.template.today("yyyy-mm-dd") %&gt;  */'    
+    },    
+    combine: {        
+        files: {           
+             'build/static/js/compress-&lt;%= pkg.name %&gt;-&lt;%= pkg.version %&gt;.min.js': ['dev/static/js/*.common.js'],            
+            'build/static/js/compress.common.min.js': ['dev/static/js/*/*.common.js']        
+        }    
+    },    
+    compress:{        
+        options:{            
+            report:"min",
+        },        
+        files:[{                
+                expand:true,                
+                cwd:'dev/static/js',                
+                src:['*.js','!*.min.js','!*.common.js'],                
+                dest:'build/static/js',                
+                ext:'.min.js'           
+        }]    
+    },    
+    fileCompress:{        
+        options:{                 
+        },        
+        files:[{                
+            expand:true,                
+            cwd:'dev/static/js',                
+            src:['**/*.js','!**/*.min.js','!**/*.common.js'],                
+            dest:'build/static/js/',                
+            ext:'.min.js'            
+        }]    
+    }
+},
+</code></pre>
+  </div>
+  <p>uglify:combine 用来合并文件
+uglify:compress用来压缩文件
+uglify:fileCompress也是用来压缩文件
+下面两个的区别在于 files中的src：<em>*/</em>.js用来匹配所有的js，注意，输出的时候会保留目录层次，如果是合并到一个文件中，就把dest写成
+dest: ‘build/static/js/common.js’，并且不写ext就可以</p>
+</blockquote>
+
+<p>grunt配置总体图
+<img src="http://upload-images.jianshu.io/upload_images/1874069-aadff3927fdd3e40.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="grunt配置一览图.png" />
+最后一行代码是注册任务，当然，除了default，我们也可以注册到别的Task上去，比如<code class="highlighter-rouge">grunt.registerTask('compress', ['uglify:build']);</code>
+如果想要执行这个 task，我们就不能只输入 <code class="highlighter-rouge">grunt</code> 命令了，我们需要输入 <code class="highlighter-rouge">grunt compress</code>命令来执行这条 task，而这条 task 的任务是 uglify 下面的 build 任务，也就是说，我们只会执行 uglify 里面 build 定义的任务，而不会执行 uglify 里面定义的其他任务。
+<strong>这里需要注意的是，task 的命名不能与后面的任务配置同名，也就是说这里的 compress 不能命名成 uglify，这样会报错或者产生意外情况</strong></p>
+
+<ul>
+  <li>####8.运行查看效果
+在grunt_test目录下，运行grunt，我现在是默认执行uncss和htmlmin</li>
+</ul>
+
+<p><img src="http://upload-images.jianshu.io/upload_images/1874069-a190fe4ae3aa6974.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="grunt_done.png" /></p>
+
+<blockquote>
+  <p>详细代码放在github上面了，链接地址：<a href="https://github.com/AveSore/grunt_test">grunt_test</a></p>
+</blockquote>
