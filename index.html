@@ -1,49 +1,78 @@
 ---
 layout: default
-title: MF、Wang 的 blog
+title: MF、Wang's blog
 ---
 <div class="top">
-    <h2>说明</h2>
+    <h1>{{ page.title }}</h1>
+    <h3>写写代码，做做设计</h3>
 </div>
 <div class="main">
     <div class="article">
         <ul class="article__list">
-            <li>
-                <a href="">文章标题</a>
-                <span>2016-10-12</span>
-                <span>tag1 tag2</span>
-            </li>
-            <li>
-                <a href="">文章标题</a>
-                <span>2016-10-12</span>
-                <span>tag1 tag2</span>
-            </li>
-            <li>
-                <a href="">文章标题</a>
-                <span>2016-10-12</span>
-                <span>tag1 tag2</span>
-            </li>
-            <li>
-                <a href="">文章标题</a>
-                <span>2016-10-12</span>
-                <span>tag1 tag2</span>
-            </li>
             {% for post in paginator.posts %}
-            <li>
-                {{ post.date | date_to_string }} 
-                <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
+            <li class="article__item">
+                <a class="article__title" href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
+                <div class="article__tags">
+                    <span class="article__date"><i class="iconfont icon_date"></i>{{ post.date | date_to_string }} </span>
+                    <span class="article__tag"><i class="iconfont icon_tag"></i>tag1 tag2 </span>
+                    <span class="article__category"><i class="iconfont icon_category"></i>cat </span>
+                </div>
             </li>
             {% endfor %}
         </ul>
-        {% if paginator.previous_page %}
-            <a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}"上一页</a>
-        {% endif %}
-        {% if paginator.total_pages > 1 %}
-        <span class="next">Next</span>
-        {% endif %}
-        <span class="page_number">第{{paginator.page}}页/共{{paginator.total_pages}}页</span> 
+        <div class="page">
+            {% if paginator.total_pages > 1 %}
+                {% if paginator.previous_page %}
+                    <a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}" class="prev">
+                        <i class="iconfont icon_arrowleft"></i>NEWER POSTS
+                    </a>
+                {% endif %}
+                {% if paginator.next_page %}
+                    <a href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}" class="next">
+                        OLDER POSTS<i class="iconfont icon_arrowright"></i>
+                    </a>
+                {% endif %}
+            {% endif %}
+            <span class="page_number">{{paginator.page}}/{{paginator.total_pages}}</span> 
+        </div>
     </div>
     <div class="person">
-        <img src="img/head.jpeg" alt="">
+        <div class="person__tags">
+            <a href="" class="title">TAG</a>
+            <a href="">Html</a>
+            <a href="">JavaScript</a>
+            <a href="">Jquery</a>
+            <a href="">React</a>
+            <a href="">Html</a>
+            <a href="">JavaScript</a>
+            <a href="">Jquery</a>
+            <a href="">React</a>
+            <a href="">Html</a>
+            <a href="">JavaScript</a>
+            <a href="">Jquery</a>
+            <a href="">React</a>
+        </div>
+        <div class="person__about">
+            <a href="" class="title">ABOUT ME</a>
+            <img src="img/head.jpeg" alt="">
+            <p>写写代码，做做设计</p>
+            <p>离开世界之前，一切都只是过程</p>
+            <div class="links">
+                <a href=""><i class="iconfont icon_twitter"></i></a>
+                <a href=""><i class="iconfont icon_github"></i></a>
+                <a href=""><i class="iconfont icon_facebook"></i></a>
+                <a href=""><i class="iconfont icon_sina"></i></a>
+                <a href=""><i class="iconfont icon_wechat"></i></a>
+                <a href=""><i class="iconfont icon_qq"></i></a>
+            </div>
+        </div>
+        <div class="person__friends">
+            <a href="" class="title">FRIENDS</a>
+            <a href="">friend1</a>
+            <a href="">friend1</a>
+            <a href="">friend1</a>
+            <a href="">friend1</a>
+            <a href="">friend1</a>
+        </div>
     </div>
 </div>

@@ -1,0 +1,21 @@
+footer{
+    width: 100%;
+    background: #fff;
+    padding: 30px 0;
+}
+footer .links{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+footer .links a{
+    display: block;
+
+}
+footer .iconfont{
+    font-size: 60px;
+    color: #000;
+}
+footer .iconfont:hover{
+    color: #0c0930;
+}

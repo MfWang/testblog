@@ -28,6 +28,7 @@ facebook_username: facebook
 sina_username:  sina
 wechat_username: wechat
 qq_username:  qq
+zhihu_username: zhihu
 
 # Build settings
 markdown: kramdown

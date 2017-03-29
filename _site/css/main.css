@@ -1,86 +1,35 @@
-* ,html,body{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-ul, li{
-    list-style-type: none;
-}
-h1,h2,h3,h4,h5,h6,p{
-    margin: 0;
-    padding: 0;
-}
-a,
-a:link,
-a:visited,
-a:hover,
-a:active{
-    text-decoration: none;
-    color: #000;
-    cursor: pointer;
-}
-body{
-    min-width: 1060px;
-}
-header{
-    width: 100%;
-    height:50px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: rgba(255,255,255,0.3);
-}
-.header__content{
-    width: 1060px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: flex-start;
-}
-.header__content .header__link{
-    font-size: 20px;
-    line-height: 50px;
-    color: #fff;
-    width: 100px;
-    display: block;
-    text-align: center;
-}
+@import './site.css';
+@import './iconfont.css';
+@import './header.css';
+@import './footer.css';
+@import './article.css';
+@import './index_person.css';
+@import './page.css';
+
 .top{
     width: 100%;
-    height: 400px;
-    background: #000 url(/img/bg1.jpg) no-repeat center;
+    height: 600px;
+    background: #000 url(/img/index_bg.jpg) no-repeat center;
     background-size: cover;
+    text-align: center;
 }
-.top h2{
+.top h1{
     color: #fff;
-    font-size: 40px;
+    font-size: 80px;
+    padding-top: 200px;
+}
+.top h3{
+    color: #fff;
+    font-size: 20px;
     padding-top: 50px;
 }
 .main{
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
 }
-.article{
-    width: 760px;
-}
-.article__list li{
-    height: 80px;
-    border-bottom: 1px solid #ededed;
-}
-.article__list a{
-    display: block;
-    width: 100%;
-    height: 50px;
-    line-height: 25px;
-}
-.article__list span{
-    line-height: 30px;
-}
-.person{
-    width: 300px;
-}
-.person img{
-    width: 200px;
-    height: 200px;
-    display: block;
-    margin: 20px auto;
-}
+
+
+
+
+
+

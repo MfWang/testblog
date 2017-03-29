@@ -1,0 +1,53 @@
+.page{
+    margin-top: 20px;
+    height: 60px;
+}
+.page .iconfont{
+    font-size: 20px;
+    line-height: 60px;
+    margin: 0 10px 0 0;
+}
+.page .prev{
+    width: 200px;
+    height: 60px;
+    border: 1px solid #ededed;
+    display: block;
+    text-align: center;
+    line-height: 60px;
+    transition: all 0.3s ease-in-out;
+    float: left;
+}
+.page .next{
+    float: right;
+    width: 200px;
+    height: 60px;
+    border: 1px solid #ededed;
+    display: block;
+    text-align: center;
+    line-height: 60px;
+    transition: all 0.3s ease-in-out;
+}
+.page .next .iconfont{
+    transform: rotate(180deg);
+    line-height: 60px;
+    margin: 0 0 0 10px;
+}
+.page .prev:hover{
+    background: #006fc4;
+    color: #fff;
+}
+.page .next:hover{
+    background: #006fc4;
+    color: #fff;
+}
+.page_number{
+    border: 1px solid #ededed;
+    color: #ededed;
+    text-align: center;
+    padding: 10px;
+    border-radius: 100%;
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    font-size: 12px;
+}

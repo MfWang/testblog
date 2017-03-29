@@ -1,0 +1,44 @@
+.person{
+    width: 260px;
+}
+.person .title{
+    width: 100%;
+    font-weight: bold;
+    font-size: 22px;
+}
+.person__tags{
+    padding: 30px 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #ededed;
+}
+.person__tags a{
+    display: block;
+    padding: 10px;
+}
+.person__about{
+    padding: 30px 0;
+    border-bottom: 1px solid #ededed;
+}
+.person__about img{
+    width: 200px;
+    height: 200px;
+    display: block;
+    margin: 20px auto;
+    border-radius: 100%;
+}
+.person__friends{
+    padding: 30px 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.person__friends a{
+    display: block;
+    width: 100%;
+    line-height: 30px;
+    font-size: 18px;
+}

@@ -1,0 +1,22 @@
+header{
+    width: 100%;
+    height:50px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(255,255,255,0.3);
+}
+.header__content{
+    width: 1060px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-start;
+}
+.header__content .header__link{
+    font-size: 20px;
+    line-height: 50px;
+    color: #fff;
+    width: 100px;
+    display: block;
+    text-align: center;
+}
