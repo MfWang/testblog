@@ -1,14 +1,49 @@
 ---
 layout: default
-title: Blog
+title: MF、Wang 的 blog
 ---
-<h2>{{ page.title }}</h2>
-<p>最新文章</p>
-<ul>
-    {% for post in site.posts %}
-    <li>
-        {{ post.date | date_to_string }} 
-        <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
-    </li>
-    {% endfor %}
-</ul>
+<div class="top">
+    <h2>说明</h2>
+</div>
+<div class="main">
+    <div class="article">
+        <ul class="article__list">
+            <li>
+                <a href="">文章标题</a>
+                <span>2016-10-12</span>
+                <span>tag1 tag2</span>
+            </li>
+            <li>
+                <a href="">文章标题</a>
+                <span>2016-10-12</span>
+                <span>tag1 tag2</span>
+            </li>
+            <li>
+                <a href="">文章标题</a>
+                <span>2016-10-12</span>
+                <span>tag1 tag2</span>
+            </li>
+            <li>
+                <a href="">文章标题</a>
+                <span>2016-10-12</span>
+                <span>tag1 tag2</span>
+            </li>
+            {% for post in paginator.posts %}
+            <li>
+                {{ post.date | date_to_string }} 
+                <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% if paginator.previous_page %}
+            <a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}"上一页</a>
+        {% endif %}
+        {% if paginator.total_pages > 1 %}
+        <span class="next">Next</span>
+        {% endif %}
+        <span class="page_number">第{{paginator.page}}页/共{{paginator.total_pages}}页</span> 
+    </div>
+    <div class="person">
+        <img src="img/head.jpeg" alt="">
+    </div>
+</div>
